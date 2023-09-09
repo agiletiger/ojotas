@@ -1,0 +1,26 @@
+{
+  "name": "ojotas",
+  "version": "0.0.1",
+  "description": "The real MySQL ORM",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "node --test ./src/tests.mjs",
+    "compile:mysql": "npx sqlx-ts ./src --config ./.sqlxrc.json -g"
+  },
+  "author": "agiletiger",
+  "license": "MIT",
+  "dependencies": {
+    "core-js": "^3.32.2",
+    "mysql2": "^3.6.0",
+    "sqlx-ts": "^0.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.49.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "3.0.3"
+  }
+}

@@ -1,0 +1,11 @@
+{
+    "aliases": {
+        "j": "job",
+        "jl": "job_location"
+    },
+    "relations": {
+        "job": {
+            "hasMany": ["job_location", "locations"] 
+        }
+    }
+}
