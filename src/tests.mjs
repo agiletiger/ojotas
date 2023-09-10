@@ -37,74 +37,100 @@ test('groupAliases two aliases', () => {
 });
 
 /**
- * Assembles the query result based on identifiers and relations.
+ * Assembles objects based on relations, aliases and identifiers.
  *
- * @param {Array} queryResult - The result of the query.
- * @param {Array} identifiers - The identifiers to be used in the assembly.
- * @param {Object} relations - The relations to be used in the assembly.
- * @returns {Array} The assembled query result.
+ * @param {Object} relations - .
+ * @param {Object} aliases - .
+ * @param {Array} identifiers - Let us know when two different objects are part of the same.
+ * @param {Array} objects - What we are going to assemble.
+ * @returns {Array} The assembled result.
  */
-const assembleQueryResult = (queryResult, identifiers, relations) => {
+const assemble = (relations, aliases, identifiers, objects) => {
   const identifier = identifiers.shift();
   if (!identifier) {
-    return queryResult;
+    return objects;
   }
   const partialAssemblies = Object.values(
-    Object.groupBy(queryResult, (o) => o[identifier]),
+    Object.groupBy(objects, (o) => o[identifier]),
   );
 
-  return [].concat(
-    ...partialAssemblies.map((a) =>
-      assembleQueryResult(a, identifiers, relations),
-    ),
-  );
+  return partialAssemblies.map((a) => {
+    const g = a.map(groupAliases);
+    const parent = g[0][0];
+    // discarding head bc it is always the same as parent
+    const rest = g.map(([, ...tail]) => tail).flat();
+
+    if (rest.length === 0) return parent;
+
+    const children = assemble(relations, aliases, identifiers, rest);
+
+    const parentPrefix = Object.keys(parent)[0].split('.')[0];
+    const parentRelations = relations[aliases[parentPrefix]];
+
+    children.forEach((child) => {
+      const childPrefix = Object.keys(child)[0].split('.')[0];
+      const childName = aliases[childPrefix];
+
+      const parentChildRelation = parentRelations[childName];
+      if (parentChildRelation[0] === 'hasMany') {
+        parent[parentChildRelation[1]] ??= [];
+        parent[parentChildRelation[1]].push(child);
+      }
+    });
+
+    return parent;
+  });
 };
 
 test('assemble no aliases', () => {
-  const queryResult = [{ jobNumber: 1 }, { jobNumber: 2 }];
+  const objects = [{ jobNumber: 1 }, { jobNumber: 2 }];
 
-  const identifiers = ['jobNumber'];
   const relations = {};
+  const aliases = {};
+  const identifiers = ['j.jobNumber'];
 
-  const assemble = [{ jobNumber: 1 }, { jobNumber: 2 }];
-
-  assert.deepStrictEqual(
-    assembleQueryResult(queryResult, identifiers, relations),
-    assemble,
-  );
+  assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
+    { jobNumber: 1 },
+    { jobNumber: 2 },
+  ]);
 });
 
 test('assemble with aliases', () => {
-  const queryResult = [{ 'j.jobNumber': 1 }, { 'j.jobNumber': 2 }];
+  const objects = [{ 'j.jobNumber': 1 }, { 'j.jobNumber': 2 }];
 
-  const identifiers = ['jobNumber'];
   const relations = {};
+  const aliases = {};
+  const identifiers = ['j.jobNumber'];
 
-  assert.deepStrictEqual(
-    assembleQueryResult(queryResult, identifiers, relations),
-    [{ 'j.jobNumber': 1 }, { 'j.jobNumber': 2 }],
-  );
+  assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
+    { 'j.jobNumber': 1 },
+    { 'j.jobNumber': 2 },
+  ]);
 });
 
-test.skip('assemble hasMany single props', () => {
-  const queryResult = [
+test('assemble hasMany single props', () => {
+  const objects = [
     { 'j.jobNumber': 1, 'jl.locationId': 1 },
     { 'j.jobNumber': 1, 'jl.locationId': 2 },
     { 'j.jobNumber': 2, 'jl.locationId': 3 },
   ];
 
-  const identifiers = ['jobNumber', 'locationId'];
   const relations = {
     job: {
-      hasMany: ['job_location', 'locations'],
+      job_location: ['hasMany', 'locations'],
     },
   };
+  const aliases = {
+    j: 'job',
+    jl: 'job_location',
+  };
+  const identifiers = ['j.jobNumber', 'jl.locationId'];
 
-  assert.deepStrictEqual(
-    assembleQueryResult(queryResult, identifiers, relations),
-    [
-      { jobNumber: 1, locations: [{ locationId: 1 }, { locationId: 2 }] },
-      { jobNumber: 2, locations: [{ locationId: 3 }] },
-    ],
-  );
+  assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
+    {
+      'j.jobNumber': 1,
+      locations: [{ 'jl.locationId': 1 }, { 'jl.locationId': 2 }],
+    },
+    { 'j.jobNumber': 2, locations: [{ 'jl.locationId': 3 }] },
+  ]);
 });

@@ -5,7 +5,7 @@
     },
     "relations": {
         "job": {
-            "hasMany": ["job_location", "locations"] 
+            "job_location": ["hasMany", "locations"] 
         }
     }
 }
