@@ -1,6 +1,13 @@
 import assert from 'node:assert';
 import test from 'node:test';
-import 'core-js';
+
+const groupBy = (xs, key) => {
+  return xs.reduce((rv, x) => {
+    // eslint-disable-next-line no-param-reassign
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
+};
 
 const groupAliases = (object) => {
   const result = {};
@@ -50,9 +57,7 @@ const assemble = (relations, aliases, identifiers, objects) => {
   if (!identifier) {
     return objects;
   }
-  const partialAssemblies = Object.values(
-    Object.groupBy(objects, (o) => o[identifier]),
-  );
+  const partialAssemblies = Object.values(groupBy(objects, identifier));
 
   return partialAssemblies.map((a) => {
     const g = a.map(groupAliases);
@@ -87,7 +92,7 @@ test('assemble no aliases', () => {
 
   const relations = {};
   const aliases = {};
-  const identifiers = ['j.jobNumber'];
+  const identifiers = ['jobNumber'];
 
   assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
     { jobNumber: 1 },
