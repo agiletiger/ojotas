@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "node --test ./src/tests.mjs",
+    "test": "node --test-only ./src/tests.mjs",
     "compile:mysql": "npx sqlx-ts ./src --config ./.sqlxrc.json -g"
   },
   "author": "agiletiger",
