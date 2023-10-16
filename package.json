@@ -2,10 +2,10 @@
   "name": "ojotas",
   "version": "0.0.1",
   "description": "The real MySQL ORM",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "test": "node --test ./src/tests.mjs",
+    "test": "node --test ./src/*.test.mjs",
     "compile:mysql": "npx sqlx-ts ./src --config ./.sqlxrc.json -g"
   },
   "author": "agiletiger",

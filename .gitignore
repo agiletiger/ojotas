@@ -1,3 +1,4 @@
 node_modules
 
 .sqlxrc.json
+.nvmrc
