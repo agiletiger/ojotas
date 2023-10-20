@@ -1,8 +1,7 @@
 import assert from 'node:assert';
 import test from 'node:test';
 
-// eslint-disable-next-line import/extensions
-import groupAliases from './groupAliases.mjs';
+import groupAliases from './groupAliases.js';
 
 test('groupAliases no aliases', () => {
   const object = { a: 1, b: 2 };

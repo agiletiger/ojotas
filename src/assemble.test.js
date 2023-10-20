@@ -1,8 +1,7 @@
 import assert from 'node:assert';
 import test from 'node:test';
 
-// eslint-disable-next-line import/extensions
-import assemble from './assemble.mjs';
+import assemble from './assemble.js';
 
 test('assemble no aliases', () => {
   const objects = [{ jobNumber: 1 }, { jobNumber: 2 }];
