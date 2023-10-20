@@ -19,13 +19,23 @@ If in the end the ORM is going to bring us issues with the SQL it automagically 
 ## Key Features
 - Lets the user create sql files with intellisense against the database so writing them in enjoyable and easy.  
 This means no hidden ORM magic. If there is a problem in the query it is yours and not the ORM's fault.
-- Provides a extremely simple API to query the database. You only need to learn 2 methods.  
+- Provides a extremely simple API to query the database. Only 2 methods in V1 and just 1 method in V2.  
 No active record pattern, no dynamic methods, no obscure magic.
 - Supports querying relations and map those to nested objects. This is the what ORM stands for, mapping and not automagically generating queries.
 - Returns POJOs and then you can do as you please. No creation of classes that are expensive and most of the time are sent to the client as JSON.
 - Creates TS types with the result of the query for greater dev experience.
 - Checks queries in a compile step so there are no surprises in runtime.
 
+## Roadmap
+### V1
+- [] support simpleQuery method (no need to specify aliases as we are returning just one entity with not relations)
+- [] support complexQuery method (need to specify aliases as we are returning an entity with its relations)
+- [] create TS types from the queries
+- [] check queries in a compile step against the database
+- [] support sql intellisense in different IDEs
+
+### V2
+- [] remove the need to specify aliases manually -> simpleQuery and complexQuery methods become just query.
 
 ## Example 
 ### You have this config
