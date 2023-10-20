@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/extensions
-import groupAliases from './groupAliases.mjs';
+import groupAliases from './groupAliases.js';
 
 const groupBy = (xs, key) => {
   return xs.reduce((rv, x) => {
