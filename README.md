@@ -29,6 +29,7 @@ No active record pattern, no dynamic methods, no obscure magic.
 ## Roadmap
 ### V1
 - [] support simpleQuery method (no need to specify aliases as we are returning just one entity with not relations)
+- [] define how to specify the unique identifiers for each entity when doing complexQuery
 - [] support complexQuery method (need to specify aliases as we are returning an entity with its relations)
 - [] create TS types from the queries
 - [] check queries in a compile step against the database
@@ -36,6 +37,19 @@ No active record pattern, no dynamic methods, no obscure magic.
 
 ### V2
 - [] remove the need to specify aliases manually -> simpleQuery and complexQuery methods become just query.
+
+## API V1
+```ts
+/** 
+ * For querying an entity without relations (no need to specify aliases)
+ */
+simpleQuery(sql: string, connection: any): Promise<any[]>;
+/** 
+ * For querying an entity with its relations (need to specify aliases in V1)
+ */
+complexQuery(sql: string, connection: any): Promise<any[]>;
+```
+
 
 ## Example 
 ### You have this config
