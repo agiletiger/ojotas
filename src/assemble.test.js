@@ -55,3 +55,30 @@ test('assemble hasMany single props', () => {
     { 'j.jobNumber': 2, locations: [{ 'jl.locationId': 3 }] },
   ]);
 });
+
+test('assemble hasMany null', () => {
+  const objects = [
+    { 'j.jobNumber': 1, 'jl.locationId': 1 },
+    { 'j.jobNumber': 1, 'jl.locationId': 2 },
+    { 'j.jobNumber': 2, 'jl.locationId': null },
+  ];
+
+  const relations = {
+    job: {
+      job_location: ['hasMany', 'locations'],
+    },
+  };
+  const aliases = {
+    j: 'job',
+    jl: 'job_location',
+  };
+  const identifiers = ['j.jobNumber', 'jl.locationId'];
+
+  assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
+    {
+      'j.jobNumber': 1,
+      locations: [{ 'jl.locationId': 1 }, { 'jl.locationId': 2 }],
+    },
+    { 'j.jobNumber': 2, locations: [] },
+  ]);
+});

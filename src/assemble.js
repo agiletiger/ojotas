@@ -19,6 +19,7 @@ const groupBy = (xs, key) => {
  */
 const assemble = (relations, aliases, identifiers, objects) => {
   const identifier = identifiers.shift();
+  const childIdentifier = identifiers[0];
   if (!identifier) {
     return objects;
   }
@@ -44,7 +45,9 @@ const assemble = (relations, aliases, identifiers, objects) => {
       const parentChildRelation = parentRelations[childName];
       if (parentChildRelation[0] === 'hasMany') {
         parent[parentChildRelation[1]] ??= [];
-        parent[parentChildRelation[1]].push(child);
+        if (child[childIdentifier] !== null) {
+          parent[parentChildRelation[1]].push(child);
+        }
       }
     });
 
