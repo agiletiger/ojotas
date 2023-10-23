@@ -32,15 +32,16 @@ No active record pattern, no dynamic methods, no obscure magic.
 
 ## Roadmap
 ### V1
-- [] support simpleQuery method (no need to specify aliases as we are returning just one entity with not relations)
-- [] define how to specify the unique identifiers for each entity when doing complexQuery
-- [] support complexQuery method (need to specify aliases as we are returning an entity with its relations)
+- [] support query method
+- [] define how to specify the unique identifiers for each entity when including relations
 - [] create TS types from the queries
 - [] check queries in a compile step against the database
-- [] support sql intellisense in different IDEs
+- [] support sql intellisense in vscode
 
 ### V2
 - [] remove the need to specify aliases manually.
+- [] support more dialects than MySQL
+- [] support sql intellisense in different IDEs
 
 ## API
 ```ts
