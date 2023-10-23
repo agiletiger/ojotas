@@ -1,7 +1,7 @@
 {
   "name": "ojotas",
-  "version": "0.0.1",
-  "description": "The real MySQL ORM",
+  "version": "0.0.2",
+  "description": "The ORM helper for complex queries",
   "type": "module",
   "scripts": {
     "lint": "eslint .",
@@ -20,6 +20,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-prettier": "^5.0.0",
+    "fast-check": "^3.13.2",
     "prettier": "3.0.3"
   }
 }
