@@ -1,5 +1,9 @@
 # Ojotas ORM
 
+## Disclaimer
+In the following section I'll do some strong arguments against ORMs. I'm not saying you should not use them if they are working for your use cases.  
+ORMs are a great tool that work most of the time. Ojotas is here to help in the cases ORMs can't.  
+
 ## Rationale
 - Most ORMs out there are proud that they support more than one SQL dialect (MySQL, PostgreSQL, Mysql Server, and so on).  
 In how many projects you had to interact with more than one dialect at the same time?  
@@ -87,7 +91,6 @@ export interface IQuery {
     result: IQueryResult;
 };
 ```
-
 
 ## Interesting links
 - https://jawj.github.io/zapatos/
