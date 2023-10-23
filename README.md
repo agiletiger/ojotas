@@ -23,7 +23,7 @@ If in the end the ORM is going to bring us issues with the SQL it automagically 
 ## Key Features
 - Lets the user create sql files with intellisense against the database so writing them in enjoyable and easy.  
 This means no hidden ORM magic. If there is a problem in the query it is yours and not the ORM's fault.
-- Provides a extremely simple API to query the database. Only 2 methods in V1 and just 1 method in V2.  
+- Provides a extremely simple API to query the database. Only 1 method!!!
 No active record pattern, no dynamic methods, no obscure magic.
 - Supports querying relations and map those to nested objects. This is the what ORM stands for, mapping and not automagically generating queries.
 - Returns POJOs and then you can do as you please. No creation of classes that are expensive and most of the time are sent to the client as JSON.
@@ -40,20 +40,17 @@ No active record pattern, no dynamic methods, no obscure magic.
 - [] support sql intellisense in different IDEs
 
 ### V2
-- [] remove the need to specify aliases manually -> simpleQuery and complexQuery methods become just query.
+- [] remove the need to specify aliases manually.
 
-## API V1
+## API
 ```ts
 /** 
- * For querying an entity without relations (no need to specify aliases)
+ * @param {Object} connection - .
+ * @param {String} sql - .
+ * @param {Array} identifiers - Let us know when two different objects are part of the same.
  */
-simpleQuery(sql: string, connection: any): Promise<any[]>;
-/** 
- * For querying an entity with its relations (need to specify aliases in V1)
- */
-complexQuery(sql: string, connection: any): Promise<any[]>;
+query<T>(connection: Connection, sql: string, identifiers: string[]): Promise<T[]>;
 ```
-
 
 ## Example 
 ### You have this config
