@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint .",
-    "test": "node --test ./src/*.test.js",
+    "test": "node --env-file=.env.test --test ./src/*.test.js",
     "compile:mysql": "npx sqlx-ts ./src --config ./.sqlxrc.json -g"
   },
   "author": "agiletiger",
