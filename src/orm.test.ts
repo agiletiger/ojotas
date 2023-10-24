@@ -79,15 +79,15 @@ describe('orm', async () => {
     );
     assert.deepStrictEqual(res, [
       {
-        'u.name': 'Nico',
+        name: 'Nico',
         posts: [
-          { 'p.title': 'Nico First Post', 'p.content': 'a' },
-          { 'p.title': 'Nico Second Post', 'p.content': 'b' },
+          { title: 'Nico First Post', content: 'a' },
+          { title: 'Nico Second Post', content: 'b' },
         ],
       },
       {
-        'u.name': 'Ivan',
-        posts: [{ 'p.title': 'Ivan Third Post', 'p.content': 'c' }],
+        name: 'Ivan',
+        posts: [{ title: 'Ivan Third Post', content: 'c' }],
       },
     ]);
   });
@@ -100,17 +100,17 @@ describe('orm', async () => {
     );
     assert.deepStrictEqual(res, [
       {
-        'u.name': 'Nico',
+        name: 'Nico',
         posts: [
-          { 'p.title': 'Nico First Post', 'p.content': 'a' },
-          { 'p.title': 'Nico Second Post', 'p.content': 'b' },
+          { title: 'Nico First Post', content: 'a' },
+          { title: 'Nico Second Post', content: 'b' },
         ],
       },
       {
-        'u.name': 'Ivan',
-        posts: [{ 'p.title': 'Ivan Third Post', 'p.content': 'c' }],
+        name: 'Ivan',
+        posts: [{ title: 'Ivan Third Post', content: 'c' }],
       },
-      { 'u.name': 'Diego', posts: [] },
+      { name: 'Diego', posts: [] },
     ]);
   });
 });
