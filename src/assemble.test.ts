@@ -2,20 +2,7 @@ import * as assert from 'node:assert';
 import test from 'node:test';
 import { Relations, assemble } from './assemble';
 
-test('assemble no aliases', () => {
-  const objects = [{ jobNumber: 1 }, { jobNumber: 2 }];
-
-  const relations = {};
-  const aliases = {};
-  const identifiers = ['jobNumber'];
-
-  assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
-    { jobNumber: 1 },
-    { jobNumber: 2 },
-  ]);
-});
-
-test('assemble with aliases', () => {
+test('assemble', () => {
   const objects = [{ 'j.jobNumber': 1 }, { 'j.jobNumber': 2 }];
 
   const relations = {};
@@ -23,8 +10,8 @@ test('assemble with aliases', () => {
   const identifiers = ['j.jobNumber'];
 
   assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
-    { 'j.jobNumber': 1 },
-    { 'j.jobNumber': 2 },
+    { jobNumber: 1 },
+    { jobNumber: 2 },
   ]);
 });
 
@@ -48,10 +35,10 @@ test('assemble hasMany single props', () => {
 
   assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
     {
-      'j.jobNumber': 1,
-      locations: [{ 'jl.locationId': 1 }, { 'jl.locationId': 2 }],
+      jobNumber: 1,
+      locations: [{ locationId: 1 }, { locationId: 2 }],
     },
-    { 'j.jobNumber': 2, locations: [{ 'jl.locationId': 3 }] },
+    { jobNumber: 2, locations: [{ locationId: 3 }] },
   ]);
 });
 
@@ -75,9 +62,9 @@ test('assemble hasMany null', () => {
 
   assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
     {
-      'j.jobNumber': 1,
-      locations: [{ 'jl.locationId': 1 }, { 'jl.locationId': 2 }],
+      jobNumber: 1,
+      locations: [{ locationId: 1 }, { locationId: 2 }],
     },
-    { 'j.jobNumber': 2, locations: [] },
+    { jobNumber: 2, locations: [] },
   ]);
 });
