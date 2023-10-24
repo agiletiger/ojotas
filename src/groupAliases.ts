@@ -1,4 +1,4 @@
-const groupAliases = (object) => {
+export const groupAliases = (object: Record<string, unknown>) => {
   const result = {};
 
   // eslint-disable-next-line no-restricted-syntax, guard-for-in
@@ -10,5 +10,3 @@ const groupAliases = (object) => {
 
   return Object.values(result);
 };
-
-export default groupAliases;

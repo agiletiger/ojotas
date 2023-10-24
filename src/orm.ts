@@ -1,6 +1,6 @@
-import fs from 'node:fs';
-import assemble from './assemble.js';
-import { isSelectingFromMultipleTables } from './isSelectingFromMultipleTables.js';
+import * as fs from 'node:fs';
+import { assemble } from './assemble';
+import { isSelectingFromMultipleTables } from './isSelectingFromMultipleTables';
 
 const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 

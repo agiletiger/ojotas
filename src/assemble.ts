@@ -1,12 +1,18 @@
-import groupAliases from './groupAliases.js';
+import { groupAliases } from './groupAliases';
 
-const groupBy = (xs, key) => {
+const groupBy = (xs: Record<string, unknown>[], key: string) => {
   return xs.reduce((rv, x) => {
     // eslint-disable-next-line no-param-reassign
+    // @ts-expect-error FIXME
     (rv[x[key]] = rv[x[key]] || []).push(x);
     return rv;
   }, {});
 };
+
+export type Relations = Record<
+  string,
+  Record<string, ['hasMany' | 'hasOne', string]>
+>;
 
 /**
  * Assembles objects based on relations, aliases and identifiers.
@@ -17,7 +23,12 @@ const groupBy = (xs, key) => {
  * @param {Array} objects - What we are going to assemble.
  * @returns {Array} The assembled result.
  */
-const assemble = (relations, aliases, identifiers, objects) => {
+export const assemble = (
+  relations: Relations,
+  aliases: Record<string, string>,
+  identifiers: string[],
+  objects: Record<string, unknown>[],
+) => {
   const identifier = identifiers.shift();
   const childIdentifier = identifiers[0];
   if (!identifier) {
@@ -26,6 +37,7 @@ const assemble = (relations, aliases, identifiers, objects) => {
   const partialAssemblies = Object.values(groupBy(objects, identifier));
 
   return partialAssemblies.map((a) => {
+    // @ts-expect-error FIXME
     const g = a.map(groupAliases);
     const parent = g[0][0];
     // discarding head bc it is always the same as parent
@@ -54,5 +66,3 @@ const assemble = (relations, aliases, identifiers, objects) => {
     return parent;
   });
 };
-
-export default assemble;

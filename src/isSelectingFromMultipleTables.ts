@@ -1,4 +1,4 @@
-export const isSelectingFromMultipleTables = (sql) => {
+export const isSelectingFromMultipleTables = (sql: string) => {
   const columns = [
     ...new Set(
       sql

@@ -1,7 +1,7 @@
-import assert from 'node:assert';
+import * as assert from 'node:assert';
 import test from 'node:test';
 
-import groupAliases from './groupAliases.js';
+import { groupAliases } from './groupAliases';
 
 test('groupAliases no aliases', () => {
   const object = { a: 1, b: 2 };

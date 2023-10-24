@@ -1,8 +1,7 @@
 import { describe, it } from 'node:test';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import fc from 'fast-check';
 
-import { isSelectingFromMultipleTables } from './isSelectingFromMultipleTables.js';
+import { isSelectingFromMultipleTables } from './isSelectingFromMultipleTables';
 
 describe('isSelectingFromMultipleTables', () => {
   it('should return false when selecting from a single table', () => {

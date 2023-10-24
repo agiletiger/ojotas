@@ -1,7 +1,6 @@
-import assert from 'node:assert';
+import * as assert from 'node:assert';
 import test from 'node:test';
-
-import assemble from './assemble.js';
+import { Relations, assemble } from './assemble';
 
 test('assemble no aliases', () => {
   const objects = [{ jobNumber: 1 }, { jobNumber: 2 }];
@@ -36,7 +35,7 @@ test('assemble hasMany single props', () => {
     { 'j.jobNumber': 2, 'jl.locationId': 3 },
   ];
 
-  const relations = {
+  const relations: Relations = {
     job: {
       job_location: ['hasMany', 'locations'],
     },
@@ -63,7 +62,7 @@ test('assemble hasMany null', () => {
     { 'j.jobNumber': 2, 'jl.locationId': null },
   ];
 
-  const relations = {
+  const relations: Relations = {
     job: {
       job_location: ['hasMany', 'locations'],
     },
