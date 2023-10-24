@@ -1,14 +1,14 @@
 import { after, describe, before, it } from 'node:test';
-import assert from 'node:assert';
-import mysql from 'mysql2/promise';
-import { query } from './orm.js';
+import * as assert from 'node:assert';
+import * as mysql from 'mysql2/promise';
+import { query } from './orm';
 
 describe('orm', async () => {
   let connection = null;
   before(async () => {
-    const connectionOptions = {
+    const connectionOptions: mysql.ConnectionOptions = {
       host: process.env.DB_HOST,
-      port: process.env.DB_PORT,
+      port: Number(process.env.DB_PORT),
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
     };
