@@ -6,7 +6,7 @@ const groupBy = (xs: Record<string, unknown>[], key: string) => {
     // @ts-expect-error FIXME
     (rv[x[key]] = rv[x[key]] || []).push(x);
     return rv;
-  }, {});
+  }, {}) as Record<string, Record<string, unknown>[]>;
 };
 
 export type Relations = Record<
@@ -37,11 +37,13 @@ export const assemble = (
   const partialAssemblies = Object.values(groupBy(objects, identifier));
 
   return partialAssemblies.map((a) => {
-    // @ts-expect-error FIXME
     const g = a.map(groupAliases);
     const parent = g[0][0];
     // discarding head bc it is always the same as parent
-    const rest = g.map(([, ...tail]) => tail).flat();
+    const rest = g.map(([, ...tail]) => tail).flat() as Record<
+      string,
+      unknown
+    >[];
 
     if (rest.length === 0) return parent;
 
