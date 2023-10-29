@@ -4,8 +4,10 @@ import * as mysql from 'mysql2/promise';
 import { query } from './orm';
 
 describe('orm', async () => {
-  let connection = null;
+  let connection: mysql.Connection;
   before(async () => {
+    const database = process.env.DB_NAME;
+
     const connectionOptions: mysql.ConnectionOptions = {
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
@@ -13,9 +15,9 @@ describe('orm', async () => {
       password: process.env.DB_PASSWORD,
     };
     connection = await mysql.createConnection(connectionOptions);
-    await connection.execute('drop database if exists ojotas;');
-    await connection.execute('create database ojotas;');
-    connection.changeUser({ database: process.env.DB_NAME });
+    await connection.execute(`drop database if exists ${database};`);
+    await connection.execute(`create database ${database};`);
+    connection.changeUser({ database });
     try {
       await connection.execute(`
       CREATE TABLE users (
