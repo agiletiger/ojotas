@@ -1,7 +1,8 @@
 node_modules
 built
 
+.vscode
+
 .env.test
 
-.sqlxrc.json
 .nvmrc
