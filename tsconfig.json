@@ -1,5 +1,8 @@
 {
   "compilerOptions": {
+    "compilerOptions": {
+      "strict": true
+    },
     "outDir": "./built",
     "target": "ES2015",
     "lib": ["ES2015"],
