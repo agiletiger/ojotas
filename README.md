@@ -7,7 +7,7 @@ ORMs are a great tool that work most of the time. Ojotas is here to help in the 
 ## Rationale
 - Most ORMs out there are proud that they support more than one SQL dialect (MySQL, PostgreSQL, Mysql Server, and so on).  
 In how many projects you had to interact with more than one dialect at the same time?  
-Having to support many dialects is not an easy task, the more dialects they support the more surface for bugs to be there when you less expect them.
+Having to support many dialects is not an easy task, the more dialects they support the more surface for bugs to be there when you least expect them.
 - In order to use an ORM you need to learn how to use it (obvious right?), but why?  
 Do we really need to learn yet another tool with a bunch of methods, complexities, intricacies and nuances?
 - Unless you are doing something very trivial chances are that you will at some point have issues with the ORM.  
@@ -30,6 +30,7 @@ No active record pattern, no dynamic methods, no obscure magic.
 - Creates TS types with the result of the query for greater dev experience.
 - Checks queries in a compile step so there are no surprises in runtime.
 
+
 ## Roadmap
 ### V1
 - [] support query method
@@ -43,52 +44,47 @@ No active record pattern, no dynamic methods, no obscure magic.
 - [] support more dialects than MySQL
 - [] support sql intellisense in different IDEs
 
-## API
-```ts
-/** 
- * @param {Object} connection - .
- * @param {String} sql - .
- * @param {Array} identifiers - Let us know when two different objects are part of the same.
- */
-query<T>(connection: Connection, sql: string, identifiers: string[]): Promise<T[]>;
-```
 
 ## Example 
 ### You have this config
 ```json
 {
-    "aliases": {
-        "j": "job",
-        "jl": "job_location"
-    },
-    "relations": {
-        "job": {
-            "job_location": ["hasMany", "locations"] 
-        }
+  "aliases": {
+    "u": "users",
+    "p": "posts"
+  },
+  "relations": {
+    "users": {
+      "posts": ["hasMany", "posts"] 
     }
+  }
 }
 ```
-### you have this sql file
+### you have a selectAllUsersWithPosts.sql file like this
 ```sql
-select j.jobNumber, jl.locationId, jl.dispatcherNotes from job j inner join job_location jl on j.jobId = jl.jobId;
+select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id
 ```
-### these are the types the ORM will generate
+### this is the type the ORM will generate for a query without params
 ```ts
-export type QueryParams = [];
-
-export interface IQueryResult {
-    jobNumber: number;
-    locations: {
-        locationId: string;
-        dispatcherNotes: string;
-    }[]
-};
-
-export interface IQuery {
-    params: QueryParams;
-    result: IQueryResult;
-};
+export interface ISelectAllUsersWithPostsQueryResultItem {
+  name: string;
+  posts: Array<{
+    title: string;
+    content: string;
+  }>;
+}
 ```
+
+
+## API
+```ts
+/** 
+ * @param {Object} connection - active connection for the db you want to query.
+ * @param {Function: (connection: mysql.Connection) => Promise<T[]>} sql - compiled representation of written sql string with type definitions.
+ */
+query(connection: Connection, sql: SqlFn): Promise<T[]>;
+```
+
 
 ## Interesting links
 - https://jawj.github.io/zapatos/
