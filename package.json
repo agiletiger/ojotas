@@ -11,8 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "mysql2": "^3.6.0",
-    "node-sql-parser": "^4.11.0",
-    "sqlx-ts": "^0.4.0"
+    "node-sql-parser": "^4.11.0"
   },
   "devDependencies": {
     "@types/node": "^20.8.8",
