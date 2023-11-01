@@ -20,12 +20,14 @@ const getSqlFnTemplate = (
   innerCode: string,
   queryName: string,
 ) => `
-  export const ${queryName} = (connection: mysql.Connection, assemble, ojotasConfig) => {
+  import { Connection, AssembleFn, OjotasConfig } from './types';
+
+  export const ${queryName} = async (connection: Connection, assemble: AssembleFn, ojotasConfig: OjotasConfig) => {
     const sql = "${sql}";
     try {
       const [rows] = await connection.execute(sql);
       
-      return ${innerCode} as Promise<${getResultTypeName(queryName)}[]>;
+      return ${innerCode} as ${getResultTypeName(queryName)}[];
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(\`Error executing query: \${sql}\`, error);
@@ -52,7 +54,7 @@ export const generateSqlFnFromSql = (
       sql,
       `assemble(ojotasConfig.relations, ojotasConfig.aliases, ${JSON.stringify(
         identifiers,
-      )}, rows)`,
+      )}, rows as Record<string, unknown>[],)`,
       queryName,
     );
   } else {

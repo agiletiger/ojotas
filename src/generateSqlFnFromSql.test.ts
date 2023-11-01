@@ -21,12 +21,14 @@ describe('generateSqlFnFromSql', () => {
     assertEqualIgnoreWhiteSpaces(
       sqlFn,
       `
-      export const selectAllUsers = (connection: mysql.Connection, assemble, ojotasConfig) => {
+      import { Connection, AssembleFn, OjotasConfig } from './types';
+
+      export const selectAllUsers = async (connection: Connection, assemble: AssembleFn, ojotasConfig: OjotasConfig) => {
         const sql = "select u.id as 'u.id', u.name as 'u.name' from users u";
         try {
           const [rows] = await connection.execute(sql);
           
-          return rows as Promise<ISelectAllUsersQueryResultItem[]>;
+          return rows as ISelectAllUsersQueryResultItem[];
         } catch (error) {
           // eslint-disable-next-line no-console
           console.error(\`Error executing query: \${sql}\`, error);
@@ -48,12 +50,14 @@ describe('generateSqlFnFromSql', () => {
     assertEqualIgnoreWhiteSpaces(
       sqlFn,
       `
-      export const selectAllUsersWithPosts = (connection: mysql.Connection, assemble, ojotasConfig) => {
+      import { Connection, AssembleFn, OjotasConfig } from './types';
+
+      export const selectAllUsersWithPosts = async (connection: Connection, assemble: AssembleFn, ojotasConfig: OjotasConfig) => {
         const sql = "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id";
         try {
           const [rows] = await connection.execute(sql);
           
-          return assemble(ojotasConfig.relations, ojotasConfig.aliases, ["u.name","p.title"], rows) as Promise<ISelectAllUsersWithPostsQueryResultItem[]>;
+          return assemble(ojotasConfig.relations, ojotasConfig.aliases, ["u.name","p.title"], rows as Record<string, unknown>[],) as ISelectAllUsersWithPostsQueryResultItem[];
         } catch (error) {
           // eslint-disable-next-line no-console
           console.error(\`Error executing query: \${sql}\`, error);

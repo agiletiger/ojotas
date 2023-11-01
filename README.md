@@ -97,3 +97,5 @@ query(connection: Connection, sql: SqlFn): Promise<T[]>;
 - https://github.com/adelsz/pgtyped
 - https://github.com/nettofarah/mysql-schema-ts
 - https://sqlc.dev/
+- https://github.com/mysqljs/named-placeholders
+

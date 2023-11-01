@@ -2,6 +2,21 @@ import { after, describe, before, it } from 'node:test';
 import * as assert from 'node:assert';
 import * as mysql from 'mysql2/promise';
 import { query } from './orm';
+import { SqlFn } from './types';
+
+interface ISelectUsersQueryResultItem {
+  id: string;
+  name: string;
+}
+
+interface ISelectUsersWithPostsQueryResultItem {
+  id: string;
+  name: string;
+  posts: Array<{
+    title: string;
+    content: string;
+  }>;
+}
 
 describe('orm', async () => {
   let connection: mysql.Connection;
@@ -56,7 +71,13 @@ describe('orm', async () => {
   });
 
   it('should work for query without relations using select *', async () => {
-    const res = await query(connection, 'select * from users', []);
+    const sqlFn: SqlFn<ISelectUsersQueryResultItem> = async (connection) => {
+      const sql = 'select * from users';
+      const [rows] = await connection.execute(sql);
+      return rows as ISelectUsersQueryResultItem[];
+    };
+
+    const res = await query(connection, sqlFn);
     assert.deepStrictEqual(res, [
       { id: 1, name: 'Nico' },
       { id: 2, name: 'Ivan' },
@@ -65,7 +86,13 @@ describe('orm', async () => {
   });
 
   it('should work for query without relations using select with columns list', async () => {
-    const res = await query(connection, 'select id, name from users', []);
+    const sqlFn: SqlFn<ISelectUsersQueryResultItem> = async (connection) => {
+      const sql = 'select id, name from users';
+      const [rows] = await connection.execute(sql);
+      return rows as ISelectUsersQueryResultItem[];
+    };
+
+    const res = await query(connection, sqlFn);
     assert.deepStrictEqual(res, [
       { id: 1, name: 'Nico' },
       { id: 2, name: 'Ivan' },
@@ -74,11 +101,23 @@ describe('orm', async () => {
   });
 
   it('should work for query with relations (inner join)', async () => {
-    const res = await query(
+    const sqlFn: SqlFn<ISelectUsersWithPostsQueryResultItem> = async (
       connection,
-      "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
-      ['u.name', 'p.title'],
-    );
+      assemble,
+      ojotasConfig,
+    ) => {
+      const sql =
+        "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id";
+      const [rows] = await connection.execute(sql);
+      return assemble(
+        ojotasConfig.relations,
+        ojotasConfig.aliases,
+        ['u.name', 'p.title'],
+        rows as Record<string, unknown>[],
+      ) as ISelectUsersWithPostsQueryResultItem[];
+    };
+
+    const res = await query(connection, sqlFn);
     assert.deepStrictEqual(res, [
       {
         name: 'Nico',
@@ -95,11 +134,23 @@ describe('orm', async () => {
   });
 
   it('should work for query with relations (left join)', async () => {
-    const res = await query(
+    const sqlFn: SqlFn<ISelectUsersWithPostsQueryResultItem> = async (
       connection,
-      "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u left join posts p on u.id = p.user_id",
-      ['u.name', 'p.title'],
-    );
+      assemble,
+      ojotasConfig,
+    ) => {
+      const sql =
+        "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u left join posts p on u.id = p.user_id";
+      const [rows] = await connection.execute(sql);
+      return assemble(
+        ojotasConfig.relations,
+        ojotasConfig.aliases,
+        ['u.name', 'p.title'],
+        rows as Record<string, unknown>[],
+      ) as ISelectUsersWithPostsQueryResultItem[];
+    };
+
+    const res = await query(connection, sqlFn);
     assert.deepStrictEqual(res, [
       {
         name: 'Nico',

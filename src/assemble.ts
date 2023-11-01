@@ -14,6 +14,13 @@ export type Relations = Record<
   Record<string, ['hasMany' | 'hasOne', string]>
 >;
 
+export type AssembleFn = <T>(
+  relations: Relations,
+  aliases: Record<string, string>,
+  identifiers: string[],
+  objects: Record<string, unknown>[],
+) => T[];
+
 const removePrefixesFromKeys = (object) =>
   Object.entries(object).reduce((acc, [key, value]) => {
     const parts = key.split('.');
@@ -30,17 +37,17 @@ const removePrefixesFromKeys = (object) =>
  * @param {Array} objects - What we are going to assemble.
  * @returns {Array} The assembled result.
  */
-export const assemble = (
+export const assemble: AssembleFn = <T>(
   relations: Relations,
   aliases: Record<string, string>,
   identifiers: string[],
   objects: Record<string, unknown>[],
-) => {
+): T[] => {
   const identifier = identifiers.shift();
   const childIdentifier = identifiers[0];
   const childPrefix = childIdentifier?.split('.')[0];
   if (!identifier) {
-    return objects;
+    return objects as T[];
   }
   const partialAssemblies = Object.values(groupBy(objects, identifier));
 
@@ -75,5 +82,5 @@ export const assemble = (
 
       return parent;
     })
-    .map(removePrefixesFromKeys);
+    .map(removePrefixesFromKeys) as T[];
 };
