@@ -4,10 +4,7 @@ import { getSelectedColumns } from './getSelectedColumns';
 import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
 import { getTableDefinition } from './getTableDefinition';
 import { Relations } from './assemble';
-
-const capitalize = (str: string) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
+import { getResultTypeName } from './getResultTypeName';
 
 export const generateTypeDefinitionFromSql = async (
   relations: Relations,
@@ -33,12 +30,10 @@ export const generateTypeDefinitionFromSql = async (
     tableTypes.push({ table, types });
   }
 
-  const capitalizedQueryName = capitalize(queryName);
-
   // MVP: we are only checking if there is a relation to the immediate previous table
   // TODO: check against all previous seen tables
   return `
-    export interface I${capitalizedQueryName}QueryResultItem {
+    export interface ${getResultTypeName(queryName)} {
       ${tableTypes
         .map(({ table, types }, index, array) => {
           if (index === 0) {
