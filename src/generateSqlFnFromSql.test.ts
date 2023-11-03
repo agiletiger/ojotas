@@ -21,11 +21,11 @@ describe('generateSqlFnFromSql', () => {
     assertEqualIgnoreWhiteSpaces(
       sqlFn,
       `
-      import { Connection, AssembleFn, OjotasConfig } from './types';
+      import { Connection } from './types';
 
       $$TYPES_PLACEHOLDER$$
 
-      export const selectAllUsers = async (connection: Connection, assemble: AssembleFn, ojotasConfig: OjotasConfig) => {
+      export const selectAllUsers = async (connection: Connection) => {
         const sql = "select u.id as 'u.id', u.name as 'u.name' from users u";
         try {
           const [rows] = await connection.execute(sql);

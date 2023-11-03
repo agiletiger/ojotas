@@ -19,12 +19,17 @@ const getSqlFnTemplate = (
   sql: string,
   innerCode: string,
   queryName: string,
+  assemble: boolean,
 ) => `
-  import { Connection, AssembleFn, OjotasConfig } from './types';
+  import { Connection${
+    assemble ? ', AssembleFn, OjotasConfig' : ''
+  } } from './types';
 
   $$TYPES_PLACEHOLDER$$
 
-  export const ${queryName} = async (connection: Connection, assemble: AssembleFn, ojotasConfig: OjotasConfig) => {
+  export const ${queryName} = async (connection: Connection${
+    assemble ? ', assemble: AssembleFn, ojotasConfig: OjotasConfig' : ''
+  }) => {
     const sql = "${sql}";
     try {
       const [rows] = await connection.execute(sql);
@@ -58,8 +63,9 @@ export const generateSqlFnFromSql = (
         identifiers,
       )}, rows as Record<string, unknown>[],)`,
       queryName,
+      true,
     );
   } else {
-    return getSqlFnTemplate(sql, `rows`, queryName);
+    return getSqlFnTemplate(sql, `rows`, queryName, false);
   }
 };
