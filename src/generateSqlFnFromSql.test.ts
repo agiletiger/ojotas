@@ -23,6 +23,8 @@ describe('generateSqlFnFromSql', () => {
       `
       import { Connection, AssembleFn, OjotasConfig } from './types';
 
+      $$TYPES_PLACEHOLDER$$
+
       export const selectAllUsers = async (connection: Connection, assemble: AssembleFn, ojotasConfig: OjotasConfig) => {
         const sql = "select u.id as 'u.id', u.name as 'u.name' from users u";
         try {
@@ -51,6 +53,8 @@ describe('generateSqlFnFromSql', () => {
       sqlFn,
       `
       import { Connection, AssembleFn, OjotasConfig } from './types';
+
+      $$TYPES_PLACEHOLDER$$
 
       export const selectAllUsersWithPosts = async (connection: Connection, assemble: AssembleFn, ojotasConfig: OjotasConfig) => {
         const sql = "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id";

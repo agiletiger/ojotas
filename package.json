@@ -13,6 +13,7 @@
   "author": "agiletiger",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.3.1",
     "fast-glob": "^3.3.1",
     "mysql2": "^3.6.0",
     "node-sql-parser": "^4.11.0"

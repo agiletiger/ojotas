@@ -22,6 +22,8 @@ const getSqlFnTemplate = (
 ) => `
   import { Connection, AssembleFn, OjotasConfig } from './types';
 
+  $$TYPES_PLACEHOLDER$$
+
   export const ${queryName} = async (connection: Connection, assemble: AssembleFn, ojotasConfig: OjotasConfig) => {
     const sql = "${sql}";
     try {

@@ -3,6 +3,7 @@ dist
 
 .vscode
 
-.env.test
+.env
+.env.*
 
 .nvmrc
