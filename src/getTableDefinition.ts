@@ -1,5 +1,9 @@
 import * as mysql from 'mysql2/promise';
-import { TableDefinition } from './interfaces';
+import { ColumnDefinition } from './mapColumnDefinitionToType';
+
+export interface TableDefinition {
+  [columnName: string]: ColumnDefinition;
+}
 
 const getEnumNameFromColumn = (dataType: string, columnName: string): string =>
   `${dataType}_${columnName}`;

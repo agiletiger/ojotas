@@ -1,4 +1,7 @@
-import { ColumnDefinition } from './interfaces';
+export interface ColumnDefinition {
+  udtName: string;
+  nullable: boolean;
+}
 
 export const mapColumnDefinitionToType = (column: ColumnDefinition) => {
   switch (column.udtName) {
