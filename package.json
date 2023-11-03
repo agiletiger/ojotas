@@ -7,9 +7,13 @@
     "ts": "node -r ts-node/register",
     "test": "npm run ts -- --env-file=.env.test --test ./src/*.test.ts"
   },
+  "bin": {
+    "ojotas-codegen": "dist/codegen.js"
+  },
   "author": "agiletiger",
   "license": "MIT",
   "dependencies": {
+    "fast-glob": "^3.3.1",
     "mysql2": "^3.6.0",
     "node-sql-parser": "^4.11.0"
   },

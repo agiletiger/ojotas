@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
+    "outDir": "dist",
     "target": "ES2015",
     "lib": ["ES2015"],
     "module": "NodeNext",
