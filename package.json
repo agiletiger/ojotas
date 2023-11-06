@@ -1,17 +1,29 @@
 {
   "name": "ojotas",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "The ORM helper for complex queries",
   "scripts": {
     "lint": "eslint ./src",
-    "test": "node -r ts-node/register --env-file=.env.test --test ./src/*.test.ts",
-    "compile:mysql": "npx sqlx-ts ./src --config ./.sqlxrc.json -g"
+    "with-ts": "node -r ts-node/register",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "test": "npm run with-ts -- --env-file=.env.test --test ./src/*.test.ts"
+  },
+  "main": "./lib/cjs/orm.js",
+  "module": "./lib/esm/orm.js",
+  "types": "./lib/esm/orm.d.ts",
+  "files": [
+    "lib/"
+  ],
+  "bin": {
+    "ojotas-codegen": "lib/cjs/codegen.js"
   },
   "author": "agiletiger",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.3.1",
+    "fast-glob": "^3.3.1",
     "mysql2": "^3.6.0",
-    "sqlx-ts": "^0.4.0"
+    "node-sql-parser": "^4.11.0"
   },
   "devDependencies": {
     "@types/node": "^20.8.8",
