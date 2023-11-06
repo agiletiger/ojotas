@@ -1,14 +1,21 @@
 {
   "name": "ojotas",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "The ORM helper for complex queries",
   "scripts": {
     "lint": "eslint ./src",
-    "ts": "node -r ts-node/register",
-    "test": "npm run ts -- --env-file=.env.test --test ./src/*.test.ts"
+    "with-ts": "node -r ts-node/register",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "test": "npm run with-ts -- --env-file=.env.test --test ./src/*.test.ts"
   },
+  "main": "./lib/cjs/orm.js",
+  "module": "./lib/esm/orm.js",
+  "types": "./lib/esm/orm.d.ts",
+  "files": [
+    "lib/"
+  ],
   "bin": {
-    "ojotas-codegen": "dist/codegen.js"
+    "ojotas-codegen": "lib/cjs/codegen.js"
   },
   "author": "agiletiger",
   "license": "MIT",

@@ -10,8 +10,8 @@ const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
 describe('generateTypeDefinitionFromSql', () => {
-  let connection: mysql.Connection = null;
-  const database = process.env.DB_NAME;
+  let connection: mysql.Connection;
+  const database = process.env.DB_NAME as string;
   const relations = JSON.parse(
     fs.readFileSync('.ojotasrc.json').toString(),
   ).relations;

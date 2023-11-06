@@ -23,7 +23,7 @@ const getSqlFnTemplate = (
 ) => `
   import { Connection${
     assemble ? ', AssembleFn, OjotasConfig' : ''
-  } } from './types';
+  } } from 'ojotas';
 
   $$TYPES_PLACEHOLDER$$
 

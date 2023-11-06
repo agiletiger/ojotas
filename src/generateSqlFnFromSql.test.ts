@@ -21,7 +21,7 @@ describe('generateSqlFnFromSql', () => {
     assertEqualIgnoreWhiteSpaces(
       sqlFn,
       `
-      import { Connection } from './types';
+      import { Connection } from 'ojotas';
 
       $$TYPES_PLACEHOLDER$$
 
@@ -52,7 +52,7 @@ describe('generateSqlFnFromSql', () => {
     assertEqualIgnoreWhiteSpaces(
       sqlFn,
       `
-      import { Connection, AssembleFn, OjotasConfig } from './types';
+      import { Connection, AssembleFn, OjotasConfig } from 'ojotas';
 
       $$TYPES_PLACEHOLDER$$
 
