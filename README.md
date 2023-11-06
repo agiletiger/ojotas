@@ -18,6 +18,7 @@ In that situation you are presented with two options. Either try to hack around 
 I don't know who or when but at some point in history someone said writing raw SQL is bad, why?
 - It is a LIE that you don't need to know SQL and just be well off with an ORM if what you are building is something not trivial.  
 If in the end the ORM is going to bring us issues with the SQL it automagically generates and you will end up learning SQL, why don't we just start off writing it ourselves?
+- Queries are not portable. You create a query in your favorite editor and then you need to translate it to the ORM's dsl.
 
 
 ## Key Features
