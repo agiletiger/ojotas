@@ -30,6 +30,8 @@ No active record pattern, no dynamic methods, no obscure magic.
 - Creates TS types with the result of the query for greater dev experience.
 - Checks queries in a compile step so there are no surprises in runtime.
 
+## Providing feedback
+There is a side repo [ojotas-test-app](https://github.com/agiletiger/ojotas-test-app) to play with ojotas orm and provide feedback
 
 ## Roadmap
 ### V1
