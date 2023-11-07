@@ -8,7 +8,7 @@ import * as path from 'path';
 import * as mysql from 'mysql2/promise';
 
 import { generateSqlFnFromSql } from './generateSqlFnFromSql';
-import { generateTypeDefinitionFromSql } from './generateTypeDefinitionFromSql';
+import { generateReturnTypeFromSql } from './generateReturnTypeFromSql';
 
 const codegen = async () => {
   const rootPath: string = process.argv[2];
@@ -30,7 +30,7 @@ const codegen = async () => {
     const sql = fs.readFileSync(file, 'utf8').replace(/\n/g, '');
     const basename = path.basename(file, '.sql');
     const generatedSqlFile = generateSqlFnFromSql(ojotasConfig, basename, sql);
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const returnType = await generateReturnTypeFromSql(
       ojotasConfig.relations,
       connection,
       database,
@@ -40,7 +40,7 @@ const codegen = async () => {
     const outputPath = path.join(path.dirname(file), basename + '.sql.ts');
     fs.writeFileSync(
       outputPath,
-      generatedSqlFile.replace('$$TYPES_PLACEHOLDER$$', typeDefinition),
+      generatedSqlFile.replace('$returnTypePlaceholder$', returnType),
     );
   }
 

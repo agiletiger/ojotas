@@ -4,12 +4,12 @@ import * as fs from 'node:fs';
 
 import * as mysql from 'mysql2/promise';
 
-import { generateTypeDefinitionFromSql } from './generateTypeDefinitionFromSql';
+import { generateReturnTypeFromSql } from './generateReturnTypeFromSql';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
-describe('generateTypeDefinitionFromSql', () => {
+describe('generateReturnTypeFromSql', () => {
   let connection: mysql.Connection;
   const database = process.env.DB_NAME as string;
   const relations = JSON.parse(
@@ -31,7 +31,7 @@ describe('generateTypeDefinitionFromSql', () => {
 
   it('should create the type when querying from a single table listing the columns', async () => {
     const queryName = 'selectAllUsers';
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const typeDefinition = await generateReturnTypeFromSql(
       relations,
       connection,
       database,
@@ -52,7 +52,7 @@ describe('generateTypeDefinitionFromSql', () => {
 
   it('should create the type when querying a one to many relation', async () => {
     const queryName = 'selectAllUsersWithPosts';
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const typeDefinition = await generateReturnTypeFromSql(
       relations,
       connection,
       database,
@@ -76,7 +76,7 @@ describe('generateTypeDefinitionFromSql', () => {
 
   it.skip('should create the type when querying a one to many relation (inner join)', async () => {
     const queryName = 'selectAllUsersWithPosts';
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const typeDefinition = await generateReturnTypeFromSql(
       relations,
       connection,
       database,
@@ -100,7 +100,7 @@ describe('generateTypeDefinitionFromSql', () => {
 
   it.skip('should create the type when querying a one to many relation (left join)', async () => {
     const queryName = 'selectAllUsersAndPosts';
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const typeDefinition = await generateReturnTypeFromSql(
       relations,
       connection,
       database,

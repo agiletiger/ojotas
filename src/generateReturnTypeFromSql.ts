@@ -6,7 +6,7 @@ import { getTableDefinition } from './getTableDefinition';
 import { Relations } from './assemble';
 import { getResultTypeName } from './getResultTypeName';
 
-export const generateTypeDefinitionFromSql = async (
+export const generateReturnTypeFromSql = async (
   relations: Relations,
   connection: mysql.Connection,
   schema: string,
