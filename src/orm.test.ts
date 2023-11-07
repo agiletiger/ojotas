@@ -1,8 +1,7 @@
 import { after, describe, before, it } from 'node:test';
 import * as assert from 'node:assert';
 import * as mysql from 'mysql2/promise';
-import { query } from './orm';
-import { SqlFn } from './types';
+import { query, SqlFn } from './orm';
 
 interface ISelectUsersQueryResultItem {
   id: string;
