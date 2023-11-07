@@ -6,7 +6,7 @@
     "lint": "eslint ./src",
     "with-ts": "node -r ts-node/register",
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
-    "test": "npm run with-ts -- --env-file=.env.test --test ./src/*.test.ts"
+    "test": "npm run with-ts -- --env-file=.env --test ./src/*.test.ts"
   },
   "main": "./lib/cjs/orm.js",
   "module": "./lib/esm/orm.js",
