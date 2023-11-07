@@ -19,6 +19,7 @@ I don't know who or when but at some point in history someone said writing raw S
 - It is a LIE that you don't need to know SQL and just be well off with an ORM if what you are building is something not trivial.  
 If in the end the ORM is going to bring us issues with the SQL it automagically generates and you will end up learning SQL, why don't we just start off writing it ourselves?
 - Queries are not portable. You create a query in your favorite editor and then you need to translate it to the ORM's dsl.
+- Most if not all ORMs provide no help when doing raw queries, they can throw errors in runtime if the schema is changed without them being properly updated.
 
 
 ## Key Features
@@ -29,7 +30,8 @@ No active record pattern, no dynamic methods, no obscure magic.
 - Supports querying relations and map those to nested objects. This is the what ORM stands for, mapping and not automagically generating queries.
 - Returns POJOs and then you can do as you please. No creation of classes that are expensive and most of the time are sent to the client as JSON.
 - Creates TS types with the result of the query for greater dev experience.
-- Checks queries in a compile step so there are no surprises in runtime.
+- Checks queries in a compile step to make sure they are always valid so there are no surprises in runtime.
+- Provides performance hints, check [issue 13](https://github.com/agiletiger/ojotas/issues/13)
 
 ## Providing feedback
 There is a side repo [ojotas-test-app](https://github.com/agiletiger/ojotas-test-app) to play with ojotas orm and provide feedback
