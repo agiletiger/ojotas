@@ -2,6 +2,7 @@ import { getSelectedColumns } from './getSelectedColumns';
 import { Relations } from './assemble';
 import { getResultTypeName } from './getResultTypeName';
 import { aliasify } from './aliasify';
+import * as fs from 'node:fs';
 
 const invertObject = (
   object: Record<string, string>,
@@ -15,34 +16,6 @@ const invertObject = (
   }
   return invertedObject;
 };
-
-const getSqlFnTemplate = (
-  sql: string,
-  innerCode: string,
-  queryName: string,
-  assemble: boolean,
-) => `
-  import { Connection${
-    assemble ? ', AssembleFn, OjotasConfig' : ''
-  } } from 'ojotas';
-
-  $$TYPES_PLACEHOLDER$$
-
-  export const ${queryName} = async (connection: Connection${
-    assemble ? ', assemble: AssembleFn, ojotasConfig: OjotasConfig' : ''
-  }) => {
-    const sql = "${sql}";
-    try {
-      const [rows] = await connection.execute(sql);
-      
-      return ${innerCode} as ${getResultTypeName(queryName)}[];
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(\`Error executing query: \${sql}\`, error);
-      throw error;
-    }
-  }
-`;
 
 export const generateSqlFnFromSql = (
   ojotasConfig: { aliases: Record<string, string>; relations: Relations },
@@ -58,15 +31,21 @@ export const generateSqlFnFromSql = (
       ([table, columns]) => `${tablesToAliases[table]}.${columns[0]}`,
     );
 
-    return getSqlFnTemplate(
-      aliasify(sql),
-      `assemble(ojotasConfig.relations, ojotasConfig.aliases, ${JSON.stringify(
-        identifiers,
-      )}, rows as Record<string, unknown>[],)`,
-      queryName,
-      true,
-    );
+    return fs
+      .readFileSync('./src/templates/assemble-no-params.ts')
+      .toString()
+      .replace('$queryName$', queryName)
+      .replace('$sql$', aliasify(sql))
+      .replace('$identifiers$', JSON.stringify(identifiers))
+      .replace('$returnTypeName$', getResultTypeName(queryName))
+      .replace('// @ts-nocheck', '');
   } else {
-    return getSqlFnTemplate(sql, `rows`, queryName, false);
+    return fs
+      .readFileSync('./src/templates/no-assemble-no-params.ts')
+      .toString()
+      .replace('$queryName$', queryName)
+      .replace('$sql$', aliasify(sql))
+      .replace('$returnTypeName$', getResultTypeName(queryName))
+      .replace('// @ts-nocheck', '');
   }
 };
