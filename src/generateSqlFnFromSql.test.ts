@@ -41,7 +41,7 @@ describe('generateSqlFnFromSql', () => {
     );
   });
 
-  it('should create the type when querying a one to many relation', async () => {
+  it('should create the sql function when querying a one to many relation', async () => {
     const queryName = 'selectAllUsersWithPosts';
     const sqlFn = generateSqlFnFromSql(
       ojotasConfig,
@@ -57,7 +57,7 @@ describe('generateSqlFnFromSql', () => {
       $$TYPES_PLACEHOLDER$$
 
       export const selectAllUsersWithPosts = async (connection: Connection, assemble: AssembleFn, ojotasConfig: OjotasConfig) => {
-        const sql = "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id";
+        const sql = "${'SELECT `u`.`name` AS `u.name`, `p`.`title` AS `p.title`, `p`.`content` AS `p.content` FROM `users` AS `u` INNER JOIN `posts` AS `p` ON `u`.`id` = `p`.`user_id`'}";
         try {
           const [rows] = await connection.execute(sql);
           

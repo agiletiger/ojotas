@@ -1,6 +1,7 @@
 import { getSelectedColumns } from './getSelectedColumns';
 import { Relations } from './assemble';
 import { getResultTypeName } from './getResultTypeName';
+import { aliasify } from './aliasify';
 
 const invertObject = (
   object: Record<string, string>,
@@ -58,7 +59,7 @@ export const generateSqlFnFromSql = (
     );
 
     return getSqlFnTemplate(
-      sql,
+      aliasify(sql),
       `assemble(ojotasConfig.relations, ojotasConfig.aliases, ${JSON.stringify(
         identifiers,
       )}, rows as Record<string, unknown>[],)`,
