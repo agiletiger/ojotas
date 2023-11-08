@@ -4,7 +4,7 @@ import { getSelectedColumns } from './getSelectedColumns';
 import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
 import { getTableDefinition } from './getTableDefinition';
 import { Relations } from './assemble';
-import { getResultTypeName } from './getResultTypeName';
+import { getReturnTypeName } from './getReturnTypeName';
 
 export const generateReturnTypeFromSql = async (
   relations: Relations,
@@ -33,7 +33,7 @@ export const generateReturnTypeFromSql = async (
   // MVP: we are only checking if there is a relation to the immediate previous table
   // TODO: check against all previous seen tables
   return `
-    export interface ${getResultTypeName(queryName)} {
+    export interface ${getReturnTypeName(queryName)} {
       ${tableTypes
         .map(({ table, types }, index, array) => {
           if (index === 0) {

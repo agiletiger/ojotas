@@ -1,6 +1,6 @@
 import { getSelectedColumns } from './getSelectedColumns';
 import { Relations } from './assemble';
-import { getResultTypeName } from './getResultTypeName';
+import { getReturnTypeName } from './getReturnTypeName';
 import { aliasify } from './aliasify';
 import * as fs from 'node:fs';
 
@@ -37,7 +37,7 @@ export const generateSqlFnFromSql = (
       .replace('$queryName$', queryName)
       .replace('$sql$', aliasify(sql))
       .replace('$identifiers$', JSON.stringify(identifiers))
-      .replace('$returnTypeName$', getResultTypeName(queryName))
+      .replace('$returnTypeName$', getReturnTypeName(queryName))
       .replace('// @ts-nocheck', '');
   } else {
     return fs
@@ -45,7 +45,7 @@ export const generateSqlFnFromSql = (
       .toString()
       .replace('$queryName$', queryName)
       .replace('$sql$', aliasify(sql))
-      .replace('$returnTypeName$', getResultTypeName(queryName))
+      .replace('$returnTypeName$', getReturnTypeName(queryName))
       .replace('// @ts-nocheck', '');
   }
 };
