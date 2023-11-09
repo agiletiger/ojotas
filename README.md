@@ -20,6 +20,7 @@ I don't know who or when but at some point in history someone said writing raw S
 If in the end the ORM is going to bring us issues with the SQL it automagically generates and you will end up learning SQL, why don't we just start off writing it ourselves?
 - Queries are not portable. You create a query in your favorite editor and then you need to translate it to the ORM's dsl.
 - Most if not all ORMs provide no help when doing raw queries, they can throw errors in runtime if the schema is changed without them being properly updated.
+- ORMs can cause index obfuscation, wrapping the indexing column in a function, having a performance penalty you are not aware of because you don't see the generated code until it is too late. 
 
 
 ## Key Features
