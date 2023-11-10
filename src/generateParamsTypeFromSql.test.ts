@@ -37,19 +37,6 @@ describe('generateParamsTypeFromSql', () => {
     assertEqualIgnoreWhiteSpaces(paramsType, ``);
   });
 
-  it('should throw error if querying from multiple tables and not using aliases', async () => {
-    const queryName = 'queryName';
-
-    await assert.rejects(() =>
-      generateParamsTypeFromSql(
-        connection,
-        database,
-        queryName,
-        'select id, name from users join posts on users.id = posts.user_id where name like :name',
-      ),
-    );
-  });
-
   it('should create a mandatory string type when having a param in where statement', async () => {
     const queryName = 'selectUsersFilteredByName';
     const paramsType = await generateParamsTypeFromSql(

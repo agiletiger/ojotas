@@ -1,6 +1,58 @@
-import { AST, Parser } from 'node-sql-parser';
+import { AST, ColumnRef, From, Parser } from 'node-sql-parser';
+
+// types are not provided https://github.com/taozhi8833998/node-sql-parser/issues/1662
+type Param = { type: 'param'; value: string };
+type Expr =
+  | {
+      type: 'binary_expr';
+      operator: 'AND' | 'OR';
+      left: Expr;
+      right: Expr;
+    }
+  | {
+      type: 'binary_expr';
+      operator: string;
+      left: ColumnRef | Param;
+      right: ColumnRef | Param;
+    };
 
 const OPTIONAL_PARAM_REGEXP = /:[A-Za-z_]+\?/g;
+
+const getParamBranch = (expr: Expr) =>
+  expr.left.type === 'param'
+    ? 'left'
+    : expr.right.type === 'param'
+    ? 'right'
+    : null;
+
+const getColumnBranch = (expr: Expr) =>
+  expr.left.type === 'column_ref'
+    ? 'left'
+    : expr.right.type === 'column_ref'
+    ? 'right'
+    : null;
+
+const getParamsFromExpr = (
+  expr: Expr,
+  from: From[],
+): { name: string; column: string; table: string }[] => {
+  if (expr.operator !== 'AND' && expr.operator !== 'OR') {
+    const paramBranch = getParamBranch(expr);
+    const columnBranch = getColumnBranch(expr);
+
+    const name = (expr[paramBranch] as Param).value;
+    const column = (expr[columnBranch] as ColumnRef).column;
+    const table =
+      (expr[columnBranch] as ColumnRef).table ??
+      (from.length === 1 ? from[0].table : null);
+
+    return [{ name, column, table }];
+  }
+
+  return getParamsFromExpr(expr.left as Expr, from).concat(
+    getParamsFromExpr(expr.right as Expr, from),
+  );
+};
 
 export const getParamsFromSql = (
   sql: string,
@@ -19,47 +71,25 @@ export const getParamsFromSql = (
 
   const ast = parser.astify(preprocessedSql) as AST;
 
-  console.dir(ast, { depth: null });
-
   if (ast.type === 'select' && ast.where) {
-    const paramHolder =
-      ast.where.left.type === 'param'
-        ? 'left'
-        : ast.where.right.type === 'param'
-        ? 'right'
-        : null;
+    const whereParams = getParamsFromExpr(ast.where, ast.from);
 
-    const columnHolder =
-      ast.where.left.type === 'column_ref'
-        ? 'left'
-        : ast.where.right.type === 'column_ref'
-        ? 'right'
-        : null;
+    const columnWithNoTable = whereParams.find((p) => !p.table);
 
-    if (paramHolder && columnHolder) {
-      const param = ast.where[paramHolder].value;
-      const column = ast.where[columnHolder].column;
-      const table =
-        ast.where[columnHolder].table ??
-        (ast.from.length === 1 ? ast.from[0].table : null);
-
-      if (!table) {
-        // MVP: if the query is valid we could go against the db and check to with table the column corresponds
-        // but for now we will ask the user to set aliases when working with multiple tables in a single query
-        throw new Error(
-          `do not know to which table corresponds column ${column}. please specify aliases when working with multiple tables.`,
-        );
-      }
-
-      return [
-        {
-          name: param,
-          optional: optionalParams.includes(param),
-          column,
-          table,
-        },
-      ];
+    if (columnWithNoTable) {
+      // MVP: if the query is valid we could go against the db and check to with table the column corresponds
+      // but for now we will ask the user to set aliases when working with multiple tables in a single query
+      throw new Error(
+        `do not know to which table corresponds column ${columnWithNoTable.column}. please specify aliases when working with multiple tables.`,
+      );
     }
+
+    return whereParams.map(({ name, column, table }) => ({
+      name,
+      column,
+      table,
+      optional: optionalParams.includes(name),
+    }));
   }
 
   return [];
