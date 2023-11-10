@@ -1,4 +1,5 @@
-import { AST, ColumnRef, From, Parser } from 'node-sql-parser';
+import { ColumnRef, From } from 'node-sql-parser';
+import { AST } from './parser';
 
 // types are not provided https://github.com/taozhi8833998/node-sql-parser/issues/1662
 type Param = { type: 'param'; value: string };
@@ -15,8 +16,6 @@ type Expr =
       left: ColumnRef | Param;
       right: ColumnRef | Param;
     };
-
-const OPTIONAL_PARAM_REGEXP = /:[A-Za-z_]+\?/g;
 
 const getParamBranch = (expr: Expr) =>
   expr.left.type === 'param'
@@ -54,23 +53,9 @@ const getParamsFromExpr = (
   );
 };
 
-export const getParamsFromSql = (
-  sql: string,
+export const getParamsFromAst = (
+  ast: AST,
 ): { name: string; optional: boolean; column: string; table: string }[] => {
-  const parser = new Parser();
-
-  // node-sql-parser does not like the syntax we use to define optional params :[A-Za-z_]? and it shouldn't need to support it
-  // so we will pre process the sql string to account for that
-  const optionalParams = (sql.match(OPTIONAL_PARAM_REGEXP) ?? [])
-    // remove starting : and trailing ?
-    .map((v: string) => v.slice(1, -1));
-  const preprocessedSql = optionalParams.length
-    ? // remove trialing ? to not break node-sql-parser
-      sql.replace(OPTIONAL_PARAM_REGEXP, (v) => v.slice(0, -1))
-    : sql;
-
-  const ast = parser.astify(preprocessedSql) as AST;
-
   if (ast.type === 'select' && ast.where) {
     const whereParams = getParamsFromExpr(ast.where, ast.from);
 
@@ -88,7 +73,7 @@ export const getParamsFromSql = (
       name,
       column,
       table,
-      optional: optionalParams.includes(name),
+      optional: ast.optionalParams.includes(name),
     }));
   }
 

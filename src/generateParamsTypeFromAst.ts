@@ -3,18 +3,19 @@ import * as mysql from 'mysql2/promise';
 import { getTableDefinition } from './getTableDefinition';
 import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
 import { capitalize } from './utils/capitalize';
-import { getParamsFromSql } from './getParamsFromSql';
+import { getParamsFromAst } from './getParamsFromAst';
+import { AST } from './parser';
 
 const getParamsTypeName = (queryName: string) =>
   `I${capitalize(queryName)}QueryParams`;
 
-export const generateParamsTypeFromSql = async (
+export const generateParamsTypeFromAst = async (
   connection: mysql.Connection,
   schema: string,
   queryName: string,
-  sql: string,
+  ast: AST,
 ) => {
-  const params = getParamsFromSql(sql);
+  const params = getParamsFromAst(ast);
 
   const tables = [...new Set(params.map((p) => p.table))];
 

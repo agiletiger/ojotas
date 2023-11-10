@@ -2,20 +2,21 @@ import { describe, it } from 'node:test';
 import * as assert from 'node:assert';
 import * as fs from 'node:fs';
 
-import { generateSqlFnFromSql } from './generateSqlFnFromSql';
+import { generateSqlFnFromAst } from './generateSqlFnFromAst';
+import { astify } from './parser';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
-describe('generateSqlFnFromSql', () => {
+describe('generateSqlFnFromAst', () => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
   it('should create the sql function when querying from a single table listing the columns', async () => {
     const queryName = 'selectAllUsers';
-    const sqlFn = generateSqlFnFromSql(
+    const sqlFn = generateSqlFnFromAst(
       ojotasConfig,
       queryName,
-      "select u.id as 'u.id', u.name as 'u.name' from users u",
+      astify("select u.id as 'u.id', u.name as 'u.name' from users u"),
     );
 
     assertEqualIgnoreWhiteSpaces(
@@ -29,10 +30,12 @@ describe('generateSqlFnFromSql', () => {
 
   it('should create the sql function when querying a one to many relation', async () => {
     const queryName = 'selectAllUsersWithPosts';
-    const sqlFn = generateSqlFnFromSql(
+    const sqlFn = generateSqlFnFromAst(
       ojotasConfig,
       queryName,
-      'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id',
+      astify(
+        'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id',
+      ),
     );
 
     assertEqualIgnoreWhiteSpaces(

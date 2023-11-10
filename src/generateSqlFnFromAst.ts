@@ -1,8 +1,8 @@
-import { getSelectedColumns } from './getSelectedColumns';
+import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
 import { Relations } from './assemble';
 import { getReturnTypeName } from './getReturnTypeName';
-import { aliasify } from './aliasify';
 import * as fs from 'node:fs';
+import { AST, aliasify } from './parser';
 
 const invertObject = (
   object: Record<string, string>,
@@ -17,12 +17,12 @@ const invertObject = (
   return invertedObject;
 };
 
-export const generateSqlFnFromSql = (
+export const generateSqlFnFromAst = (
   ojotasConfig: { aliases: Record<string, string>; relations: Relations },
   queryName: string,
-  sql: string,
+  ast: AST,
 ) => {
-  const selectedColumns = getSelectedColumns(sql);
+  const selectedColumns = getSelectedColumnsFromAst(ast);
   if (Object.keys(selectedColumns).length > 1) {
     const tablesToAliases = invertObject(ojotasConfig.aliases);
     // MVP: for now when selecting from multiple tables we will take the fists column of each as its identifier
@@ -35,7 +35,7 @@ export const generateSqlFnFromSql = (
       .readFileSync('./src/templates/assemble-no-params.ts')
       .toString()
       .replace('$queryName$', queryName)
-      .replace('$sql$', aliasify(sql))
+      .replace('$sql$', aliasify(ast))
       .replace('$identifiers$', JSON.stringify(identifiers))
       .replace('$returnTypeName$', getReturnTypeName(queryName))
       .replace('// @ts-nocheck', '');
@@ -44,7 +44,7 @@ export const generateSqlFnFromSql = (
       .readFileSync('./src/templates/no-assemble-no-params.ts')
       .toString()
       .replace('$queryName$', queryName)
-      .replace('$sql$', aliasify(sql))
+      .replace('$sql$', aliasify(ast))
       .replace('$returnTypeName$', getReturnTypeName(queryName))
       .replace('// @ts-nocheck', '');
   }

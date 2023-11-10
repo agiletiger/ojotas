@@ -3,12 +3,13 @@ import * as assert from 'node:assert';
 
 import * as mysql from 'mysql2/promise';
 
-import { generateParamsTypeFromSql } from './generateParamsTypeFromSql';
+import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
+import { astify } from './parser';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
-describe('generateParamsTypeFromSql', () => {
+describe('generateParamsTypeFromAst', () => {
   let connection: mysql.Connection;
   const database = process.env.DB_NAME as string;
   before(async () => {
@@ -27,11 +28,11 @@ describe('generateParamsTypeFromSql', () => {
 
   it('should be no type if no params', async () => {
     const queryName = 'selectAllUsers';
-    const paramsType = await generateParamsTypeFromSql(
+    const paramsType = await generateParamsTypeFromAst(
       connection,
       database,
       queryName,
-      'select id, name from users',
+      astify('select id, name from users'),
     );
 
     assertEqualIgnoreWhiteSpaces(paramsType, ``);
@@ -39,11 +40,11 @@ describe('generateParamsTypeFromSql', () => {
 
   it('should create a mandatory string type when having a param in where statement', async () => {
     const queryName = 'selectUsersFilteredByName';
-    const paramsType = await generateParamsTypeFromSql(
+    const paramsType = await generateParamsTypeFromAst(
       connection,
       database,
       queryName,
-      'select id, name from users where name like :name',
+      astify('select id, name from users where name like :name'),
     );
 
     assertEqualIgnoreWhiteSpaces(
@@ -58,11 +59,11 @@ describe('generateParamsTypeFromSql', () => {
 
   it('should create an optional string type when having an optional param in where statement', async () => {
     const queryName = 'selectUsersFilteredByName';
-    const paramsType = await generateParamsTypeFromSql(
+    const paramsType = await generateParamsTypeFromAst(
       connection,
       database,
       queryName,
-      'select id, name from users where name like :name?',
+      astify('select id, name from users where name like :name?'),
     );
 
     assertEqualIgnoreWhiteSpaces(
