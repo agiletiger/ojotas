@@ -55,6 +55,17 @@ describe('getParamsFromAst', () => {
     );
   });
 
+  it('should detect mandatory param in where statement after a join', () => {
+    assert.deepEqual(
+      getParamsFromAst(
+        astify(
+          'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id where p.title like :title',
+        ),
+      ),
+      [{ name: 'title', optional: false, table: 'posts', column: 'title' }],
+    );
+  });
+
   it('should detect many mandatory params in where statement', () => {
     assert.deepEqual(
       getParamsFromAst(

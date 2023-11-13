@@ -41,9 +41,13 @@ const getParamsFromExpr = (
 
     const name = (expr[paramBranch] as Param).value;
     const column = (expr[columnBranch] as ColumnRef).column;
+    const as = (expr[columnBranch] as ColumnRef).table;
     const table =
-      (expr[columnBranch] as ColumnRef).table ??
-      (from.length === 1 ? from[0].table : null);
+      from.length === 1
+        ? from[0].table
+        : as
+        ? from.find((f) => f.as === as).table
+        : null;
 
     return [{ name, column, table }];
   }
