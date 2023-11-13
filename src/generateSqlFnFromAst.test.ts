@@ -9,11 +9,13 @@ const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
 describe('generateSqlFnFromAst', () => {
+  const rootPath = __dirname;
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
   it('should create the sql function when querying from a single table', () => {
     const queryName = 'selectAllUsers';
     const sqlFn = generateSqlFnFromAst(
+      rootPath,
       ojotasConfig,
       queryName,
       // TODO. in order to make the ORM easy to use, simple queries like this one should not be aliased by the end user
@@ -32,6 +34,7 @@ describe('generateSqlFnFromAst', () => {
   it('should create the sql function when querying a one to many relation', () => {
     const queryName = 'selectAllUsersWithPosts';
     const sqlFn = generateSqlFnFromAst(
+      rootPath,
       ojotasConfig,
       queryName,
       astify(
@@ -51,6 +54,7 @@ describe('generateSqlFnFromAst', () => {
   it('should create the sql function when querying from a single table with params', () => {
     const queryName = 'selectUsersByName';
     const sqlFn = generateSqlFnFromAst(
+      rootPath,
       ojotasConfig,
       queryName,
       // TODO. in order to make the ORM easy to use, simple queries like this one should not be aliased by the end user
@@ -69,6 +73,7 @@ describe('generateSqlFnFromAst', () => {
   it('should create the sql function when querying a one to many relation with params', () => {
     const queryName = 'selectUsersWithCertainPosts';
     const sqlFn = generateSqlFnFromAst(
+      rootPath,
       ojotasConfig,
       queryName,
       astify(

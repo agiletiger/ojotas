@@ -1,5 +1,3 @@
-#! /usr/bin/env node
-
 import 'dotenv/config';
 
 import { globSync } from 'fast-glob';
@@ -12,8 +10,7 @@ import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
 
-const codegen = async () => {
-  const rootPath: string = process.argv[2];
+export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
   const files = globSync(path.join(rootPath, '/**/*.sql'));
@@ -32,7 +29,12 @@ const codegen = async () => {
     const sql = fs.readFileSync(file, 'utf8').replace(/\n/g, '');
     const basename = path.basename(file, '.sql');
     const ast = astify(sql);
-    const generatedSqlFile = generateSqlFnFromAst(ojotasConfig, basename, ast);
+    const generatedSqlFile = generateSqlFnFromAst(
+      nodeModulePath,
+      ojotasConfig,
+      basename,
+      ast,
+    );
     const paramsType = await generateParamsTypeFromAst(
       connection,
       database,
@@ -57,7 +59,3 @@ const codegen = async () => {
 
   connection.destroy();
 };
-
-(async () => {
-  await codegen();
-})();

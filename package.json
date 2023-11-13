@@ -1,6 +1,6 @@
 {
   "name": "ojotas",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "The ORM helper for complex queries",
   "scripts": {
     "lint": "eslint ./src",
@@ -12,10 +12,12 @@
   "module": "./lib/esm/orm.js",
   "types": "./lib/esm/orm.d.ts",
   "files": [
-    "lib/"
+    "bin/*",
+    "lib/**/*",
+    "templates/*"
   ],
   "bin": {
-    "ojotas-codegen": "lib/cjs/codegen.js"
+    "ojotas-codegen": "bin/codegen.js"
   },
   "author": "agiletiger",
   "license": "MIT",

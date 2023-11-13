@@ -25,10 +25,8 @@ export type QueryFn = <T>(
 
 const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
-export const toUnnamed = (
-  sql: string,
-  params: Record<string, unknown>,
-): [string, unknown[]] => toUnnamedBuilder()(sql, params);
+export const toUnnamed = (sql: string, params: unknown): [string, unknown[]] =>
+  toUnnamedBuilder()(sql, params);
 
 export const query: QueryFn = async (connection, executor) =>
   executor(connection, assemble, ojotasConfig);

@@ -21,10 +21,24 @@ const invertObject = (
 };
 
 export const generateSqlFnFromAst = (
+  rootPath: string, // I'm passing this so same function can work with local tests and inside node_modules. Not sure this is the right way..
   ojotasConfig: { aliases: Record<string, string>; relations: Relations },
   queryName: string,
   ast: AST,
 ) => {
+  const assembleNoParams = fs
+    .readFileSync(path.join(rootPath, '../templates/assemble-no-params.ts'))
+    .toString();
+  const assembleParams = fs
+    .readFileSync(path.join(rootPath, '../templates/assemble-params.ts'))
+    .toString();
+  const noAssembleNoParams = fs
+    .readFileSync(path.join(rootPath, '../templates/no-assemble-no-params.ts'))
+    .toString();
+  const noAssembleParams = fs
+    .readFileSync(path.join(rootPath, '../templates/no-assemble-params.ts'))
+    .toString();
+
   const selectedColumns = getSelectedColumnsFromAst(ast);
   // TODO: refactor. getParamsFromAst is also called in codegen
   const params = getParamsFromAst(ast);
@@ -36,12 +50,8 @@ export const generateSqlFnFromAst = (
       ([table, columns]) => `${tablesToAliases[table]}.${columns[0]}`,
     );
 
-    const template = params.length
-      ? 'assemble-params.ts'
-      : 'assemble-no-params.ts';
-    return fs
-      .readFileSync(path.join('./src/templates/', template))
-      .toString()
+    const template = params.length ? assembleParams : assembleNoParams;
+    return template
       .replace('$queryName$', queryName)
       .replace('$sql$', aliasify(ast))
       .replace('$identifiers$', JSON.stringify(identifiers))
@@ -49,12 +59,8 @@ export const generateSqlFnFromAst = (
       .replace('$returnTypeName$', getReturnTypeName(queryName))
       .replace('// @ts-nocheck', '');
   } else {
-    const template = params.length
-      ? 'no-assemble-params.ts'
-      : 'no-assemble-no-params.ts';
-    return fs
-      .readFileSync(path.join('./src/templates/', template))
-      .toString()
+    const template = params.length ? noAssembleParams : noAssembleNoParams;
+    return template
       .replace('$queryName$', queryName)
       .replace('$sql$', aliasify(ast))
       .replace('$paramsTypeName$', getParamsTypeName(queryName))
