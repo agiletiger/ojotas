@@ -2,12 +2,9 @@ import * as mysql from 'mysql2/promise';
 
 import { getTableDefinition } from './getTableDefinition';
 import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
-import { capitalize } from './utils/capitalize';
 import { getParamsFromAst } from './getParamsFromAst';
 import { AST } from './parser';
-
-const getParamsTypeName = (queryName: string) =>
-  `I${capitalize(queryName)}QueryParams`;
+import { getParamsTypeName } from './getParamsTypeName';
 
 export const generateParamsTypeFromAst = async (
   connection: mysql.Connection,
