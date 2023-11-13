@@ -1,10 +1,7 @@
-import { AST, Column, ColumnRef, From, Parser } from 'node-sql-parser';
+import { Column, ColumnRef, From } from 'node-sql-parser';
+import { AST } from './parser';
 
-export const getSelectedColumns = (sql: string) => {
-  const parser = new Parser();
-
-  const ast = parser.astify(sql) as AST;
-
+export const getSelectedColumnsFromAst = (ast: AST) => {
   //https://github.com/taozhi8833998/node-sql-parser/issues/1638
   if (ast.type === 'select' && ast.columns !== '*') {
     const from = ast.from as Array<From>;

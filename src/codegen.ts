@@ -1,5 +1,3 @@
-#! /usr/bin/env node
-
 import 'dotenv/config';
 
 import { globSync } from 'fast-glob';
@@ -7,11 +5,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as mysql from 'mysql2/promise';
 
-import { generateSqlFnFromSql } from './generateSqlFnFromSql';
-import { generateTypeDefinitionFromSql } from './generateTypeDefinitionFromSql';
+import { generateSqlFnFromAst } from './generateSqlFnFromAst';
+import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
+import { astify } from './parser';
+import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
 
-const codegen = async () => {
-  const rootPath: string = process.argv[2];
+export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
   const files = globSync(path.join(rootPath, '/**/*.sql'));
@@ -29,24 +28,34 @@ const codegen = async () => {
   for await (const file of files) {
     const sql = fs.readFileSync(file, 'utf8').replace(/\n/g, '');
     const basename = path.basename(file, '.sql');
-    const generatedSqlFile = generateSqlFnFromSql(ojotasConfig, basename, sql);
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const ast = astify(sql);
+    const generatedSqlFile = generateSqlFnFromAst(
+      nodeModulePath,
+      ojotasConfig,
+      basename,
+      ast,
+    );
+    const paramsType = await generateParamsTypeFromAst(
+      connection,
+      database,
+      basename,
+      ast,
+    );
+    const returnType = await generateReturnTypeFromAst(
       ojotasConfig.relations,
       connection,
       database,
       basename,
-      sql,
+      ast,
     );
     const outputPath = path.join(path.dirname(file), basename + '.sql.ts');
     fs.writeFileSync(
       outputPath,
-      generatedSqlFile.replace('$$TYPES_PLACEHOLDER$$', typeDefinition),
+      generatedSqlFile
+        .replace('$paramsTypePlaceholder$', paramsType)
+        .replace('$returnTypePlaceholder$', returnType),
     );
   }
 
   connection.destroy();
 };
-
-(async () => {
-  await codegen();
-})();

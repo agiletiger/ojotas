@@ -4,12 +4,13 @@ import * as fs from 'node:fs';
 
 import * as mysql from 'mysql2/promise';
 
-import { generateTypeDefinitionFromSql } from './generateTypeDefinitionFromSql';
+import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
+import { astify } from './parser';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
-describe('generateTypeDefinitionFromSql', () => {
+describe('generateReturnTypeFromAst', () => {
   let connection: mysql.Connection;
   const database = process.env.DB_NAME as string;
   const relations = JSON.parse(
@@ -31,12 +32,12 @@ describe('generateTypeDefinitionFromSql', () => {
 
   it('should create the type when querying from a single table listing the columns', async () => {
     const queryName = 'selectAllUsers';
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const typeDefinition = await generateReturnTypeFromAst(
       relations,
       connection,
       database,
       queryName,
-      "select u.id as 'u.id', u.name as 'u.name' from users u",
+      astify('select id, name from users'),
     );
 
     assertEqualIgnoreWhiteSpaces(
@@ -52,12 +53,14 @@ describe('generateTypeDefinitionFromSql', () => {
 
   it('should create the type when querying a one to many relation', async () => {
     const queryName = 'selectAllUsersWithPosts';
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const typeDefinition = await generateReturnTypeFromAst(
       relations,
       connection,
       database,
       queryName,
-      "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
+      astify(
+        "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
+      ),
     );
 
     assertEqualIgnoreWhiteSpaces(
@@ -76,12 +79,14 @@ describe('generateTypeDefinitionFromSql', () => {
 
   it.skip('should create the type when querying a one to many relation (inner join)', async () => {
     const queryName = 'selectAllUsersWithPosts';
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const typeDefinition = await generateReturnTypeFromAst(
       relations,
       connection,
       database,
       queryName,
-      "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
+      astify(
+        "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
+      ),
     );
 
     assertEqualIgnoreWhiteSpaces(
@@ -100,12 +105,14 @@ describe('generateTypeDefinitionFromSql', () => {
 
   it.skip('should create the type when querying a one to many relation (left join)', async () => {
     const queryName = 'selectAllUsersAndPosts';
-    const typeDefinition = await generateTypeDefinitionFromSql(
+    const typeDefinition = await generateReturnTypeFromAst(
       relations,
       connection,
       database,
       queryName,
-      "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u left join posts p on u.id = p.user_id",
+      astify(
+        "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u left join posts p on u.id = p.user_id",
+      ),
     );
 
     assertEqualIgnoreWhiteSpaces(

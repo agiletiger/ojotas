@@ -1,21 +1,22 @@
 import * as mysql from 'mysql2/promise';
 
-import { getSelectedColumns } from './getSelectedColumns';
+import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
 import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
 import { getTableDefinition } from './getTableDefinition';
 import { Relations } from './assemble';
-import { getResultTypeName } from './getResultTypeName';
+import { getReturnTypeName } from './getReturnTypeName';
+import { AST } from './parser';
 
-export const generateTypeDefinitionFromSql = async (
+export const generateReturnTypeFromAst = async (
   relations: Relations,
   connection: mysql.Connection,
   schema: string,
   queryName: string,
-  sql: string,
+  ast: AST,
 ) => {
   const tableTypes: { table: string; types: string }[] = [];
 
-  const selectedColumns = getSelectedColumns(sql);
+  const selectedColumns = getSelectedColumnsFromAst(ast);
   for await (const [table, columns] of Object.entries(selectedColumns)) {
     const tableDefinition = await getTableDefinition(connection, schema, table);
 
@@ -33,7 +34,7 @@ export const generateTypeDefinitionFromSql = async (
   // MVP: we are only checking if there is a relation to the immediate previous table
   // TODO: check against all previous seen tables
   return `
-    export interface ${getResultTypeName(queryName)} {
+    export interface ${getReturnTypeName(queryName)} {
       ${tableTypes
         .map(({ table, types }, index, array) => {
           if (index === 0) {
