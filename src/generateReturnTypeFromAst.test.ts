@@ -1,41 +1,36 @@
-import { after, before, describe, it } from 'node:test';
+import { describe, it } from 'node:test';
 import * as assert from 'node:assert';
 import * as fs from 'node:fs';
 
-import * as mysql from 'mysql2/promise';
-
 import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
+import { TableDefinition } from './getTableDefinition';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
 describe('generateReturnTypeFromAst', () => {
-  let connection: mysql.Connection;
-  const database = process.env.DB_NAME as string;
+  const tableDefinitions: Record<string, TableDefinition> = {
+    users: {
+      id: { udtName: 'int', nullable: false },
+      name: { udtName: 'varchar', nullable: false },
+    },
+    posts: {
+      content: { udtName: 'text', nullable: true },
+      id: { udtName: 'int', nullable: false },
+      title: { udtName: 'varchar', nullable: true },
+      user_id: { udtName: 'int', nullable: true },
+    },
+  };
   const relations = JSON.parse(
     fs.readFileSync('.ojotasrc.json').toString(),
   ).relations;
-  before(async () => {
-    const connectionOptions: mysql.ConnectionOptions = {
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-    };
-    connection = await mysql.createConnection(connectionOptions);
-  });
 
-  after(() => {
-    connection.destroy();
-  });
-
-  it('should create the type when querying from a single table listing the columns', async () => {
+  it('should create the type when querying from a single table listing the columns', () => {
     const queryName = 'selectAllUsers';
-    const typeDefinition = await generateReturnTypeFromAst(
+    const typeDefinition = generateReturnTypeFromAst(
+      tableDefinitions,
       relations,
-      connection,
-      database,
       queryName,
       astify('select id, name from users'),
     );
@@ -51,12 +46,11 @@ describe('generateReturnTypeFromAst', () => {
     );
   });
 
-  it('should create the type when querying a one to many relation', async () => {
+  it('should create the type when querying a one to many relation', () => {
     const queryName = 'selectAllUsersWithPosts';
-    const typeDefinition = await generateReturnTypeFromAst(
+    const typeDefinition = generateReturnTypeFromAst(
+      tableDefinitions,
       relations,
-      connection,
-      database,
       queryName,
       astify(
         "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
@@ -77,12 +71,11 @@ describe('generateReturnTypeFromAst', () => {
     );
   });
 
-  it.skip('should create the type when querying a one to many relation (inner join)', async () => {
+  it.skip('should create the type when querying a one to many relation (inner join)', () => {
     const queryName = 'selectAllUsersWithPosts';
-    const typeDefinition = await generateReturnTypeFromAst(
+    const typeDefinition = generateReturnTypeFromAst(
+      tableDefinitions,
       relations,
-      connection,
-      database,
       queryName,
       astify(
         "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
@@ -103,12 +96,11 @@ describe('generateReturnTypeFromAst', () => {
     );
   });
 
-  it.skip('should create the type when querying a one to many relation (left join)', async () => {
+  it.skip('should create the type when querying a one to many relation (left join)', () => {
     const queryName = 'selectAllUsersAndPosts';
-    const typeDefinition = await generateReturnTypeFromAst(
+    const typeDefinition = generateReturnTypeFromAst(
+      tableDefinitions,
       relations,
-      connection,
-      database,
       queryName,
       astify(
         "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u left join posts p on u.id = p.user_id",

@@ -1,26 +1,21 @@
-import * as mysql from 'mysql2/promise';
-
 import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
 import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
-import { getTableDefinition } from './getTableDefinition';
+import { TableDefinition } from './getTableDefinition';
 import { Relations } from './assemble';
 import { getReturnTypeName } from './getReturnTypeName';
 import { AST } from './parser';
 
-export const generateReturnTypeFromAst = async (
+export const generateReturnTypeFromAst = (
+  tableDefinitions: Record<string, TableDefinition>,
   relations: Relations,
-  connection: mysql.Connection,
-  schema: string,
   queryName: string,
   ast: AST,
 ) => {
   const tableTypes: { table: string; types: string }[] = [];
 
   const selectedColumns = getSelectedColumnsFromAst(ast);
-  for await (const [table, columns] of Object.entries(selectedColumns)) {
-    const tableDefinition = await getTableDefinition(connection, schema, table);
-
-    const types = Object.entries(tableDefinition)
+  for (const [table, columns] of Object.entries(selectedColumns)) {
+    const types = Object.entries(tableDefinitions[table])
       .filter(([columnName]) => columns.includes(columnName))
       .map(
         ([columnName, columnDefinition]) =>
