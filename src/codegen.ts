@@ -9,6 +9,7 @@ import { generateSqlFnFromAst } from './generateSqlFnFromAst';
 import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
+import { getTableDefinition } from './getTableDefinition';
 
 export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
@@ -25,26 +26,49 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
   };
   const connection = await mysql.createConnection(connectionOptions);
 
-  for await (const file of files) {
+  const readFiles = files.map((file) => {
     const sql = fs.readFileSync(file, 'utf8').replace(/\n/g, '');
     const basename = path.basename(file, '.sql');
     const ast = astify(sql);
+    return { file, basename, ast };
+  });
+
+  const visitedTables = [
+    ...new Set(
+      readFiles
+        .flatMap(({ ast }) => (ast.type === 'select' ? ast.from : []))
+        .map((f) => f.table),
+    ),
+  ];
+
+  const tableDefinitions = Object.fromEntries(
+    await Promise.all(
+      visitedTables.map(async (table) => {
+        const definition = await getTableDefinition(
+          connection,
+          database,
+          table,
+        );
+        return [table, definition];
+      }),
+    ),
+  );
+
+  for await (const { file, basename, ast } of readFiles) {
     const generatedSqlFile = generateSqlFnFromAst(
       nodeModulePath,
       ojotasConfig,
       basename,
       ast,
     );
-    const paramsType = await generateParamsTypeFromAst(
-      connection,
-      database,
+    const paramsType = generateParamsTypeFromAst(
+      tableDefinitions,
       basename,
       ast,
     );
-    const returnType = await generateReturnTypeFromAst(
+    const returnType = generateReturnTypeFromAst(
+      tableDefinitions,
       ojotasConfig.relations,
-      connection,
-      database,
       basename,
       ast,
     );
