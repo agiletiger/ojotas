@@ -12,6 +12,13 @@ describe('parser', () => {
       );
     });
 
+    it('should not add aliases when selecting from a single table', () => {
+      assert.equal(
+        aliasify(astify('select id, name from users')),
+        'SELECT `id`, `name` FROM `users`',
+      );
+    });
+
     it('should alias when there are no aliases present in query', () => {
       assert.equal(
         aliasify(

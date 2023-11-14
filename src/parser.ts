@@ -30,7 +30,7 @@ export const sqlify = (ast: AST) => parser.sqlify(ast);
 
 export const aliasify = (ast: AST) => {
   //https://github.com/taozhi8833998/node-sql-parser/issues/1638
-  if (ast.type === 'select' && ast.columns !== '*') {
+  if (ast.type === 'select' && ast.columns !== '*' && ast.from?.length > 1) {
     ast.columns = ast.columns.map(({ expr }) => ({
       expr,
       as: expr.column !== '*' ? `${expr.table}.${expr.column}` : null,
