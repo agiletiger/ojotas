@@ -1,4 +1,4 @@
-# Ojotas ORM
+# Ojotas database-first ORM
 
 ## Disclaimer
 In the following section I'll do some strong arguments against ORMs. I'm not saying you should not use them if they are working for your use cases.  
@@ -52,7 +52,7 @@ There is a side repo [ojotas-test-app](https://github.com/agiletiger/ojotas-test
 
 
 ## Example 
-### You have this config
+> You have this config
 ```json
 {
   "aliases": {
@@ -66,11 +66,11 @@ There is a side repo [ojotas-test-app](https://github.com/agiletiger/ojotas-test
   }
 }
 ```
-### you have a selectAllUsersWithPosts.sql file like this
+> you have a selectAllUsersWithPosts.sql file like this
 ```sql
 select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id
 ```
-### this is the type the ORM will generate for a query without params
+> this is the type the ORM will generate for a query without params
 ```ts
 export interface ISelectAllUsersWithPostsQueryResultItem {
   name: string;
@@ -86,22 +86,41 @@ export interface ISelectAllUsersWithPostsQueryResultItem {
 ```ts
 /** 
  * @param {Object} connection - active connection for the db you want to query.
- * @param {Function: (connection: mysql.Connection) => Promise<T[]>} sql - compiled representation of written sql string with type definitions.
+ * @param {Function: (connection: Connection) => Promise<T[]>} sql - compiled representation of written sql string with type definitions.
  */
 query(connection: Connection, sql: SqlFn): Promise<T[]>;
 ```
 
 
+## Previous work that inspired this project
+https://jawj.github.io/zapatos/  
+What I like about Zapatos is the idea of talking to the database to generate types.  
+It generates types for all tables, in the case of Ojotas we only generate types of what you are using through the queries.  
+Also the idea of [Everyday CRUD](https://jawj.github.io/zapatos/#everyday-crud) is noble and worth exploring for Ojotas [see discussion](https://github.com/agiletiger/ojotas/discussions/24)  
+What I don't like is how the user needs to manually write the types. Ojotas automates that.
+
+https://github.com/adelsz/pgtyped  
+Ojotas has the same approach of creating types from the queries as pgtyped.  
+What pgtypes does not provide is the mapping when including 1 to N relations in the query.  
+I'm not convinced of the magic pgtyped does with the [special annotations](https://pgtyped.dev/docs/sql-file) but I haven't properly tested yet.  
+Also It does some [dark magic](https://github.com/adelsz/pgtyped/blob/master/packages/runtime/src/preprocessor-sql.ts) at runtime wheareas Ojotas gives you the exact sql it will execute at compile time.  
+Nonetheless it seems a very good alternative if you are using PostgreSQL.
+
+https://sqlc.dev/  
+Same ideas as pgtyped but implemented in Go.  
+I think I like more the [macros](https://docs.sqlc.dev/en/stable/reference/macros.html) because I can see the generated code than pgtyped's special annotations. 
+
+https://github.com/Seb-C/kiss-orm  
+I agree a lot with some of their philosophy points:
+- No query builder (you can use the full power and expressiveness of SQL)
+- Immutability of the objects
+- No magic. Everything is explicit. No database operation is done unless explicitly requested.
+- Simplicity: the architecture is ridiculously simple. If you need complex operations, you have the freedom to write it without worries.
+- No mappings: Kiss-ORM always assumes that the column and JS properties have the same name.
+
+https://github.com/SweetIQ/schemats  
+I took the code to query the database and get the types from there.  
+
 ## Interesting links
-- https://jawj.github.io/zapatos/
-- https://github.com/jawj/mostly-ormless
 - https://en.wikipedia.org/wiki/Object%E2%80%93relational_impedance_mismatch
-- https://github.com/SweetIQ/schemats
-- https://phiresky.github.io/blog/2020/sql-libs-for-typescript/
-- https://github.com/mikro-orm/mikro-orm
-- https://github.com/Seb-C/kiss-orm
-- https://github.com/adelsz/pgtyped
-- https://github.com/nettofarah/mysql-schema-ts
-- https://sqlc.dev/
-- https://github.com/mysqljs/named-placeholders
 

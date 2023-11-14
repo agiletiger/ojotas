@@ -1,7 +1,7 @@
 {
   "name": "ojotas",
   "version": "0.0.5",
-  "description": "The ORM helper for complex queries",
+  "description": "The database-first ORM",
   "scripts": {
     "lint": "eslint ./src",
     "with-ts": "node -r ts-node/register",
