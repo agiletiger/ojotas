@@ -18,8 +18,7 @@ describe('generateSqlFnFromAst', () => {
       rootPath,
       ojotasConfig,
       queryName,
-      // TODO. in order to make the ORM easy to use, simple queries like this one should not be aliased by the end user
-      astify('select u.id, u.name from users u'),
+      astify('select id, name from users'),
     );
 
     assertEqualIgnoreWhiteSpaces(
@@ -57,8 +56,7 @@ describe('generateSqlFnFromAst', () => {
       rootPath,
       ojotasConfig,
       queryName,
-      // TODO. in order to make the ORM easy to use, simple queries like this one should not be aliased by the end user
-      astify('select u.id, u.name from users u where name like :name'),
+      astify('select id, name from users where name like :name'),
     );
 
     assertEqualIgnoreWhiteSpaces(

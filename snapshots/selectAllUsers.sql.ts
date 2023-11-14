@@ -4,7 +4,7 @@ import { Connection } from 'ojotas';
 $returnTypePlaceholder$
 
 export const selectAllUsers = async (connection: Connection) => {
-  const sql = 'SELECT `u`.`id` AS `u.id`, `u`.`name` AS `u.name` FROM `users` AS `u`';
+  const sql = 'SELECT `id`, `name` FROM `users`';
   try {
     const [rows] = await connection.execute(sql);
 
