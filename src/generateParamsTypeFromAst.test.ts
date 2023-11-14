@@ -1,36 +1,24 @@
-import { after, before, describe, it } from 'node:test';
+import { describe, it } from 'node:test';
 import * as assert from 'node:assert';
-
-import * as mysql from 'mysql2/promise';
 
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
 import { astify } from './parser';
+import { TableDefinition } from './getTableDefinition';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
 describe('generateParamsTypeFromAst', () => {
-  let connection: mysql.Connection;
-  const database = process.env.DB_NAME as string;
-  before(async () => {
-    const connectionOptions: mysql.ConnectionOptions = {
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-    };
-    connection = await mysql.createConnection(connectionOptions);
-  });
-
-  after(() => {
-    connection.destroy();
-  });
-
-  it('should be no type if no params', async () => {
+  const tableDefinitions: Record<string, TableDefinition> = {
+    users: {
+      id: { udtName: 'int', nullable: false },
+      name: { udtName: 'varchar', nullable: false },
+    },
+  };
+  it('should be no type if no params', () => {
     const queryName = 'selectAllUsers';
-    const paramsType = await generateParamsTypeFromAst(
-      connection,
-      database,
+    const paramsType = generateParamsTypeFromAst(
+      tableDefinitions,
       queryName,
       astify('select id, name from users'),
     );
@@ -38,11 +26,10 @@ describe('generateParamsTypeFromAst', () => {
     assertEqualIgnoreWhiteSpaces(paramsType, ``);
   });
 
-  it('should create a mandatory string type when having a param in where statement', async () => {
+  it('should create a mandatory string type when having a param in where statement', () => {
     const queryName = 'selectUsersFilteredByName';
-    const paramsType = await generateParamsTypeFromAst(
-      connection,
-      database,
+    const paramsType = generateParamsTypeFromAst(
+      tableDefinitions,
       queryName,
       astify('select id, name from users where name like :name'),
     );
@@ -57,11 +44,10 @@ describe('generateParamsTypeFromAst', () => {
     );
   });
 
-  it('should create an optional string type when having an optional param in where statement', async () => {
+  it('should create an optional string type when having an optional param in where statement', () => {
     const queryName = 'selectUsersFilteredByName';
-    const paramsType = await generateParamsTypeFromAst(
-      connection,
-      database,
+    const paramsType = generateParamsTypeFromAst(
+      tableDefinitions,
       queryName,
       astify('select id, name from users where name like :name?'),
     );

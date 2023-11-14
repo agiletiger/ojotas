@@ -1,36 +1,27 @@
-import * as mysql from 'mysql2/promise';
-
-import { getTableDefinition } from './getTableDefinition';
+import { TableDefinition } from './getTableDefinition';
 import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
 import { getParamsFromAst } from './getParamsFromAst';
 import { AST } from './parser';
 import { getParamsTypeName } from './getParamsTypeName';
 
-export const generateParamsTypeFromAst = async (
-  connection: mysql.Connection,
-  schema: string,
+export const generateParamsTypeFromAst = (
+  tableDefinitions: Record<string, TableDefinition>,
   queryName: string,
   ast: AST,
 ) => {
   const params = getParamsFromAst(ast);
 
-  const tables = [...new Set(params.map((p) => p.table))];
-
   const mappedParams: string[] = [];
 
-  for await (const table of tables) {
-    const tableDefinition = await getTableDefinition(connection, schema, table);
-
-    for (const param of params.filter((p) => p.table === table)) {
-      const columnDefinition = Object.entries(tableDefinition).find(
-        ([columnName]) => columnName === param.column,
-      )[1];
-      mappedParams.push(
-        `${param.name}${param.optional ? '?' : ''}: ${mapColumnDefinitionToType(
-          columnDefinition,
-        )};`,
-      );
-    }
+  for (const param of params) {
+    const columnDefinition = Object.entries(tableDefinitions[param.table]).find(
+      ([columnName]) => columnName === param.column,
+    )[1];
+    mappedParams.push(
+      `${param.name}${param.optional ? '?' : ''}: ${mapColumnDefinitionToType(
+        columnDefinition,
+      )};`,
+    );
   }
 
   if (mappedParams.length) {
