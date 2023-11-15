@@ -9,7 +9,7 @@ import { generateSqlFnFromAst } from './generateSqlFnFromAst';
 import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
-import { getTableDefinition } from './getTableDefinition';
+import { getTablesDefinition } from './getTablesDefinition';
 
 export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
@@ -41,7 +41,7 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
     ),
   ];
 
-  const tableDefinitions = await getTableDefinition(
+  const tableDefinitions = await getTablesDefinition(
     connection,
     database,
     visitedTables,

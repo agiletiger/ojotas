@@ -4,7 +4,7 @@ import * as fs from 'node:fs';
 
 import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
-import { TableDefinition } from './getTableDefinition';
+import { TableDefinition } from './getTablesDefinition';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));

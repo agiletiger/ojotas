@@ -6,12 +6,12 @@ export interface TableDefinition {
 }
 const getEnumNameFromColumn = (dataType: string, columnName: string): string =>
   `${dataType}_${columnName}`;
-export const getTableDefinition = async (
+export const getTablesDefinition = async (
   connection: mysql.Connection,
   tableSchema: string,
   tableNames: string[],
 ): Promise<Record<string, TableDefinition>> => {
-  const tableDefinition: Record<string, TableDefinition> = {};
+  const tablesDefinition: Record<string, TableDefinition> = {};
 
   const query = `
     SELECT 
@@ -32,16 +32,16 @@ export const getTableDefinition = async (
     const dataType = row.DATA_TYPE as string;
     const isNullable = row.IS_NULLABLE as string;
 
-    if (!tableDefinition[tableName]) {
-      tableDefinition[tableName] = {};
+    if (!tablesDefinition[tableName]) {
+      tablesDefinition[tableName] = {};
     }
 
-    tableDefinition[tableName][columnName] = {
+    tablesDefinition[tableName][columnName] = {
       udtName: /^(enum|set)$/i.test(dataType)
         ? getEnumNameFromColumn(dataType, columnName)
         : dataType,
       nullable: isNullable === 'YES',
     };
   });
-  return tableDefinition;
+  return tablesDefinition;
 };
