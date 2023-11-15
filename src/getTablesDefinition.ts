@@ -11,7 +11,7 @@ export const getTablesDefinition = async (
   tableSchema: string,
   tableNames: string[],
 ): Promise<Record<string, TableDefinition>> => {
-  const tablesDefinition: Record<string, TableDefinition> = {};
+  const tableDefinitions: Record<string, TableDefinition> = {};
 
   const query = `
     SELECT 
@@ -32,16 +32,16 @@ export const getTablesDefinition = async (
     const dataType = row.DATA_TYPE as string;
     const isNullable = row.IS_NULLABLE as string;
 
-    if (!tablesDefinition[tableName]) {
-      tablesDefinition[tableName] = {};
+    if (!tableDefinitions[tableName]) {
+      tableDefinitions[tableName] = {};
     }
 
-    tablesDefinition[tableName][columnName] = {
+    tableDefinitions[tableName][columnName] = {
       udtName: /^(enum|set)$/i.test(dataType)
         ? getEnumNameFromColumn(dataType, columnName)
         : dataType,
       nullable: isNullable === 'YES',
     };
   });
-  return tablesDefinition;
+  return tableDefinitions;
 };
