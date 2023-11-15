@@ -1,4 +1,4 @@
-import { TableDefinition } from './getTableDefinition';
+import { TableDefinition } from './getTablesDefinition';
 import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
 import { getParamsFromAst } from './getParamsFromAst';
 import { AST } from './parser';

@@ -1,6 +1,6 @@
 import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
 import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
-import { TableDefinition } from './getTableDefinition';
+import { TableDefinition } from './getTablesDefinition';
 import { Relations } from './assemble';
 import { getReturnTypeName } from './getReturnTypeName';
 import { AST } from './parser';

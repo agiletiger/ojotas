@@ -3,7 +3,7 @@ import * as assert from 'node:assert';
 
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
 import { astify } from './parser';
-import { TableDefinition } from './getTableDefinition';
+import { TableDefinition } from './getTablesDefinition';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
