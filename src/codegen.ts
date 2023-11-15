@@ -9,7 +9,8 @@ import { generateSqlFnFromAst } from './generateSqlFnFromAst';
 import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
-import { getTableDefinition } from './getTableDefinition';
+// import { getTableDefinition } from './getTableDefinition';
+import { getMultiTableDefinition } from './getTableDefinition';
 
 export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
@@ -41,17 +42,23 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
     ),
   ];
 
-  const tableDefinitions = Object.fromEntries(
-    await Promise.all(
-      visitedTables.map(async (table) => {
-        const definition = await getTableDefinition(
-          connection,
-          database,
-          table,
-        );
-        return [table, definition];
-      }),
-    ),
+  // const tableDefinitions = Object.fromEntries(
+  //   await Promise.all(
+  //     visitedTables.map(async (table) => {
+  //       const definition = await getTableDefinition(
+  //         connection,
+  //         database,
+  //         table,
+  //       );
+  //       return [table, definition];
+  //     }),
+  //   ),
+  // );
+
+  const tableDefinitions = await getMultiTableDefinition(
+    connection,
+    database,
+    visitedTables,
   );
 
   for await (const { file, basename, ast } of readFiles) {
