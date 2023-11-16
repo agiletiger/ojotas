@@ -36,12 +36,18 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const visitedTables = [
     ...new Set(
       readFiles
-        .flatMap(({ ast }) => (ast.type === 'select' ? ast.from : []))
+        .flatMap(({ ast }) =>
+          ast.type === 'select'
+            ? ast.from
+            : ast.type === 'insert'
+            ? ast.table
+            : [],
+        )
         .map((f) => f.table),
     ),
   ];
 
-  const tableDefinitions = await getTablesDefinition(
+  const tablesDefinition = await getTablesDefinition(
     connection,
     database,
     visitedTables,
@@ -55,12 +61,12 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
       ast,
     );
     const paramsType = generateParamsTypeFromAst(
-      tableDefinitions,
+      tablesDefinition,
       basename,
       ast,
     );
     const returnType = generateReturnTypeFromAst(
-      tableDefinitions,
+      tablesDefinition,
       ojotasConfig.relations,
       basename,
       ast,
