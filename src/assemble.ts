@@ -77,6 +77,10 @@ export const assemble: AssembleFn = <T>(
           if (child[childIdentifier.split('.')[1]] !== null) {
             parent[parentChildRelation[1]].push(child);
           }
+        } else if (parentChildRelation[0] === 'hasOne') {
+          if (child[childIdentifier.split('.')[1]] !== null) {
+            parent[parentChildRelation[1]] = child;
+          }
         }
       });
 
