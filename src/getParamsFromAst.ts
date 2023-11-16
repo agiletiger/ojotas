@@ -83,14 +83,14 @@ export const getParamsFromAst = (
 
   if (ast.type === 'insert') {
     const table = ast.table[0].table;
-    const params = ast.values[0].value.map((v) => v.value);
+    const params = ast.values[0].value;
 
-    console.dir(ast, { depth: null });
+    // console.dir(ast, { depth: null });
     return ast.columns.map((column, index) => ({
       table,
       column,
       optional: false,
-      name: params[index],
+      name: params[index].type === 'param' ? params[index].value : column,
     }));
   }
   return [];

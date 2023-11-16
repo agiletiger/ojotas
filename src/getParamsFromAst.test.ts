@@ -112,5 +112,18 @@ describe('getParamsFromAst', () => {
         ],
       );
     });
+
+    it('should detect unnamed params in values', () => {
+      assert.deepEqual(
+        getParamsFromAst(
+          astify('INSERT INTO users (name, email, age) VALUES (?, ?, ?)'),
+        ),
+        [
+          { name: 'name', optional: false, table: 'users', column: 'name' },
+          { name: 'email', optional: false, table: 'users', column: 'email' },
+          { name: 'age', optional: false, table: 'users', column: 'age' },
+        ],
+      );
+    });
   });
 });
