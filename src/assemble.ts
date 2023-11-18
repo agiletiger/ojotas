@@ -71,15 +71,16 @@ export const assemble: AssembleFn = <T>(
 
       const childName = aliases[childPrefix];
       const parentChildRelation = parentRelations[childName];
+      const childIdProperty = childIdentifier.split('.')[1];
 
       children.forEach((child) => {
         if (parentChildRelation[0] === 'hasMany') {
           parent[parentChildRelation[1]] ??= [];
-          if (child[childIdentifier.split('.')[1]] !== null) {
+          if (child[childIdProperty] !== null) {
             parent[parentChildRelation[1]].push(child);
           }
         } else if (parentChildRelation[0] === 'hasOne') {
-          if (child[childIdentifier.split('.')[1]] !== null) {
+          if (child[childIdProperty] !== null) {
             const existingParent = uniqueChildIds.get(
               child[childIdentifier.split('.')[1]],
             );
@@ -88,7 +89,7 @@ export const assemble: AssembleFn = <T>(
               delete parent[parentChildRelation[1]];
             } else {
               parent[parentChildRelation[1]] = child;
-              uniqueChildIds.set(child[childIdentifier.split('.')[1]], parent);
+              uniqueChildIds.set(child[childIdProperty], parent);
             }
           }
         }
