@@ -50,6 +50,7 @@ export const assemble: AssembleFn = <T>(
     return objects as T[];
   }
   const partialAssemblies = Object.values(groupBy(objects, identifier));
+  const uniqueChildIds = new Map();
 
   return partialAssemblies
     .map((a) => {
@@ -70,12 +71,27 @@ export const assemble: AssembleFn = <T>(
 
       const childName = aliases[childPrefix];
       const parentChildRelation = parentRelations[childName];
+      const childIdProperty = childIdentifier.split('.')[1];
 
       children.forEach((child) => {
         if (parentChildRelation[0] === 'hasMany') {
           parent[parentChildRelation[1]] ??= [];
-          if (child[childIdentifier.split('.')[1]] !== null) {
+          if (child[childIdProperty] !== null) {
             parent[parentChildRelation[1]].push(child);
+          }
+        } else if (parentChildRelation[0] === 'hasOne') {
+          parent[parentChildRelation[1]] ??= null;
+          if (child[childIdProperty] !== null) {
+            const existingParent = uniqueChildIds.get(
+              child[childIdentifier.split('.')[1]],
+            );
+            if (existingParent) {
+              delete existingParent[parentChildRelation[1]];
+              delete parent[parentChildRelation[1]];
+            } else {
+              parent[parentChildRelation[1]] = child;
+              uniqueChildIds.set(child[childIdProperty], parent);
+            }
           }
         }
       });

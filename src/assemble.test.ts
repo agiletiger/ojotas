@@ -68,3 +68,49 @@ test('assemble hasMany null', () => {
     { jobNumber: 2, locations: [] },
   ]);
 });
+
+test('assemble hasOne relationship', () => {
+  const objects = [
+    { 'p.personId': 1, 'c.contactId': 101 },
+    { 'p.personId': 2, 'c.contactId': 102 },
+  ];
+
+  const relations: Relations = {
+    person: {
+      contact: ['hasOne', 'contactDetails'],
+    },
+  };
+  const aliases = {
+    p: 'person',
+    c: 'contact',
+  };
+  const identifiers = ['p.personId', 'c.contactId'];
+
+  assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
+    { personId: 1, contactDetails: { contactId: 101 } },
+    { personId: 2, contactDetails: { contactId: 102 } },
+  ]);
+});
+
+test('assemble hasOne relationship with null', () => {
+  const objects = [
+    { 'p.personId': 1, 'c.contactId': 101 },
+    { 'p.personId': 2, 'c.contactId': null },
+  ];
+
+  const relations: Relations = {
+    person: {
+      contact: ['hasOne', 'contactDetails'],
+    },
+  };
+  const aliases = {
+    p: 'person',
+    c: 'contact',
+  };
+  const identifiers = ['p.personId', 'c.contactId'];
+
+  assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
+    { personId: 1, contactDetails: { contactId: 101 } },
+    { personId: 2, contactDetails: null },
+  ]);
+});
