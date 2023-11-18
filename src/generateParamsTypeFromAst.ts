@@ -26,9 +26,9 @@ export const generateParamsTypeFromAst = (
 
   if (mappedParams.length) {
     return `
-      export interface ${getParamsTypeName(queryName)} {
+      export type ${getParamsTypeName(queryName)} = {
         ${mappedParams.join('\n')}
-      }
+      };
       `;
   }
 

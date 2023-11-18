@@ -37,9 +37,9 @@ describe('generateParamsTypeFromAst', () => {
     assertEqualIgnoreWhiteSpaces(
       paramsType,
       `
-      export interface ISelectUsersFilteredByNameQueryParams {
+      export type SelectUsersFilteredByNameQueryParams = {
         name: string;
-      }
+      };
       `,
     );
   });
@@ -55,9 +55,9 @@ describe('generateParamsTypeFromAst', () => {
     assertEqualIgnoreWhiteSpaces(
       paramsType,
       `
-      export interface ISelectUsersFilteredByNameQueryParams {
+      export type SelectUsersFilteredByNameQueryParams = {
         name?: string;
-      }
+      };
       `,
     );
   });

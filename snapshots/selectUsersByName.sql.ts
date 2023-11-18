@@ -3,7 +3,7 @@ $paramsTypePlaceholder$
 
 $returnTypePlaceholder$
 
-export const selectUsersByName = (params: ISelectUsersByNameQueryParams) => {
+export const selectUsersByName = (params: SelectUsersByNameQueryParams) => {
   return () => {
     return {
       sql: 'SELECT `id`, `name` FROM `users` WHERE `name` LIKE :name',

@@ -3,7 +3,7 @@ $paramsTypePlaceholder$
 
 $returnTypePlaceholder$
 
-export const selectUsersWithCertainPosts = (params: ISelectUsersWithCertainPostsQueryParams) => {
+export const selectUsersWithCertainPosts = (params: SelectUsersWithCertainPostsQueryParams) => {
   return () => {
     return {
       sql: 'SELECT `u`.`name` AS `u.name`, `p`.`title` AS `p.title`, `p`.`content` AS `p.content` FROM `users` AS `u` INNER JOIN `posts` AS `p` ON `u`.`id` = `p`.`user_id` WHERE `p`.`title` LIKE :title',
