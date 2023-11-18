@@ -1,7 +1,12 @@
 import { after, describe, before, it } from 'node:test';
 import * as assert from 'node:assert';
-import * as mysql from 'mysql2/promise';
-import { query, Descriptor } from './orm';
+import {
+  query,
+  Descriptor,
+  Connection,
+  createMySqlConnection,
+  ConnectionOptions,
+} from './orm';
 
 interface ISelectUsersQueryResultItem {
   id: string;
@@ -18,17 +23,17 @@ interface ISelectUsersWithPostsQueryResultItem {
 }
 
 describe('orm', async () => {
-  let connection: mysql.Connection;
+  let connection: Connection;
   before(async () => {
     const database = process.env.DB_NAME;
 
-    const connectionOptions: mysql.ConnectionOptions = {
+    const connectionOptions: ConnectionOptions = {
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
     };
-    connection = await mysql.createConnection(connectionOptions);
+    connection = await createMySqlConnection(connectionOptions);
     await connection.execute(`drop database if exists ${database};`);
     await connection.execute(`create database ${database};`);
     connection.changeUser({ database });

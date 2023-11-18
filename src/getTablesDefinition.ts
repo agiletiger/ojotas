@@ -1,5 +1,5 @@
-import * as mysql from 'mysql2/promise';
 import { ColumnDefinition } from './mapColumnDefinitionToType';
+import { Connection } from './orm';
 
 export interface TableDefinition {
   [columnName: string]: ColumnDefinition;
@@ -7,7 +7,7 @@ export interface TableDefinition {
 const getEnumNameFromColumn = (dataType: string, columnName: string): string =>
   `${dataType}_${columnName}`;
 export const getTablesDefinition = async (
-  connection: mysql.Connection,
+  connection: Connection,
   tableSchema: string,
   tableNames: string[],
 ): Promise<Record<string, TableDefinition>> => {
@@ -22,10 +22,7 @@ export const getTablesDefinition = async (
       table_name IN ? AND
       table_schema = ?
   `;
-  const [results] = await connection.query<mysql.RowDataPacket[]>(query, [
-    [tableNames],
-    tableSchema,
-  ]);
+  const [results] = await connection.query(query, [[tableNames], tableSchema]);
   results.forEach((row) => {
     const tableName = row.TABLE_NAME as string;
     const columnName = row.COLUMN_NAME as string;

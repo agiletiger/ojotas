@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
+import * as mysql from 'mysql2/promise';
 
 import { assemble } from './assemble';
-import { Connection as MySqlConnection } from 'mysql2/promise';
 import createCompiler from 'named-placeholders';
 
 type Query = <T>(
@@ -9,7 +9,17 @@ type Query = <T>(
   descriptor: Descriptor<T>,
 ) => Promise<T[]>;
 
-export type Connection = MySqlConnection;
+export type ConnectionOptions = mysql.ConnectionOptions;
+
+export type Connection = {
+  query: (
+    sql: string,
+    values: unknown,
+  ) => Promise<[Record<string, unknown>[], unknown]>;
+  execute: (sql: string) => Promise<[Record<string, unknown>[], unknown]>;
+  changeUser: (options: ConnectionOptions) => Promise<void>;
+  destroy(): void;
+};
 
 export type Descriptor<T> = () => {
   sql: string;
@@ -22,11 +32,18 @@ const toUnnamed = createCompiler();
 
 const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
+export const createMySqlConnection = async (
+  options: ConnectionOptions,
+): Promise<Connection> => {
+  const connection = await mysql.createConnection(options);
+  return connection;
+};
+
 export const query: Query = async (connection, descriptor) => {
   const { sql, params, identifiers, cast } = descriptor();
   const [unnamedSql, unnamedParams] = toUnnamed(sql, params);
   try {
-    const [rows] = await connection.execute(unnamedSql, unnamedParams);
+    const [rows] = await connection.query(unnamedSql, unnamedParams);
 
     return cast(
       identifiers.length
