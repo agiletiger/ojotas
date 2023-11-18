@@ -1,32 +1,49 @@
 import * as fs from 'node:fs';
 
-import { assemble, AssembleFn, Relations } from './assemble';
+import { assemble } from './assemble';
 import { Connection as MySqlConnection } from 'mysql2/promise';
-import * as toUnnamedBuilder from 'named-placeholders';
-export { AssembleFn } from './assemble';
+import createCompiler from 'named-placeholders';
+
+type Query = <T>(
+  connection: Connection,
+  descriptor: Descriptor<T>,
+) => Promise<T[]>;
 
 export type Connection = MySqlConnection;
 
-export type OjotasConfig = {
-  relations: Relations;
-  aliases: Record<string, string>;
+export type Descriptor<T> = () => {
+  sql: string;
+  params: Record<string, unknown> | null;
+  identifiers: string[];
+  cast: (rows: unknown) => T[];
 };
 
-export type SqlFn<T> = (
-  connection: Connection,
-  assemble: AssembleFn,
-  ojotasConfig: OjotasConfig,
-) => Promise<T[]>;
-
-export type QueryFn = <T>(
-  connection: Connection,
-  executor: SqlFn<T>,
-) => Promise<T[]>;
+const toUnnamed = createCompiler();
 
 const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
-export const toUnnamed = (sql: string, params: unknown): [string, unknown[]] =>
-  toUnnamedBuilder()(sql, params);
+export const query: Query = async (connection, descriptor) => {
+  const { sql, params, identifiers, cast } = descriptor();
+  const [unnamedSql, unnamedParams] = toUnnamed(sql, params);
+  try {
+    const [rows] = await connection.execute(unnamedSql, unnamedParams);
 
-export const query: QueryFn = async (connection, executor) =>
-  executor(connection, assemble, ojotasConfig);
+    return cast(
+      identifiers.length
+        ? assemble(
+            ojotasConfig.relations,
+            ojotasConfig.aliases,
+            identifiers,
+            rows as Record<string, unknown>[],
+          )
+        : rows,
+    );
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Error executing query: ${unnamedSql} with params ${unnamedParams}`,
+      error,
+    );
+    throw error;
+  }
+};
