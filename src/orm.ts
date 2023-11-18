@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 
 import { assemble } from './assemble';
 import { Connection as MySqlConnection } from 'mysql2/promise';
-import { default as toUnnamedBuilder } from 'named-placeholders';
+import createCompiler from 'named-placeholders';
 
 type Query = <T>(
   connection: Connection,
@@ -18,7 +18,7 @@ export type Descriptor<T> = () => {
   cast: (rows: unknown) => T[];
 };
 
-const toUnnamed = toUnnamedBuilder();
+const toUnnamed = createCompiler();
 
 const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
