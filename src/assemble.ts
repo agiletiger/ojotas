@@ -80,6 +80,7 @@ export const assemble: AssembleFn = <T>(
             parent[parentChildRelation[1]].push(child);
           }
         } else if (parentChildRelation[0] === 'hasOne') {
+          parent[parentChildRelation[1]] ??= null;
           if (child[childIdProperty] !== null) {
             const existingParent = uniqueChildIds.get(
               child[childIdentifier.split('.')[1]],

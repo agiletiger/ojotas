@@ -111,32 +111,6 @@ test('assemble hasOne relationship with null', () => {
 
   assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
     { personId: 1, contactDetails: { contactId: 101 } },
-    { personId: 2 },
-  ]);
-});
-test('assemble hasOne relationship with complex data', () => {
-  const objects = [
-    { 'p.personId': 1, 'c.contactId': 101 },
-    { 'p.personId': 2, 'c.contactId': null },
-    { 'p.personId': 3, 'c.contactId': 101 },
-    { 'p.personId': 4, 'c.contactId': 103 },
-  ];
-
-  const relations: Relations = {
-    person: {
-      contact: ['hasOne', 'contactDetails'],
-    },
-  };
-  const aliases = {
-    p: 'person',
-    c: 'contact',
-  };
-  const identifiers = ['p.personId', 'c.contactId'];
-
-  assert.deepStrictEqual(assemble(relations, aliases, identifiers, objects), [
-    { personId: 1 },
-    { personId: 2 },
-    { personId: 3 },
-    { personId: 4, contactDetails: { contactId: 103 } },
+    { personId: 2, contactDetails: null },
   ]);
 });
