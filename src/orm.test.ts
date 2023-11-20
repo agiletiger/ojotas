@@ -25,27 +25,25 @@ interface ISelectUsersWithPostsQueryResultItem {
 describe('orm', async () => {
   let connection: Connection;
   before(async () => {
-    const database = process.env.DB_NAME;
-
     const connectionOptions: ConnectionOptions = {
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
     };
     connection = await createMySqlConnection(connectionOptions);
-    await connection.execute(`drop database if exists ${database};`);
-    await connection.execute(`create database ${database};`);
-    connection.changeUser({ database });
+    await connection.query(`drop table if exists posts;`);
+    await connection.query(`drop table if exists users;`);
     try {
-      await connection.execute(`
+      await connection.query(`
       CREATE TABLE users (
         id INT AUTO_INCREMENT,
         name VARCHAR(50) NOT NULL,
         PRIMARY KEY (id)
       );
     `);
-      await connection.execute(`
+      await connection.query(`
       CREATE TABLE posts (
         id INT AUTO_INCREMENT,
         user_id INT,
@@ -55,11 +53,11 @@ describe('orm', async () => {
         FOREIGN KEY (user_id) REFERENCES users(id)
       );
     `);
-      await connection.execute(`
+      await connection.query(`
       INSERT INTO users (id, name) 
       VALUES (1, 'Nico'), (2, 'Ivan'), (3, 'Diego');
     `);
-      await connection.execute(`
+      await connection.query(`
       INSERT INTO posts (user_id, title, content) 
       VALUES (1, 'Nico First Post', 'a'), (1, 'Nico Second Post', 'b'),
       (2, 'Ivan Third Post', 'c');

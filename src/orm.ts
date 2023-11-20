@@ -1,5 +1,6 @@
 import * as fs from 'node:fs';
 import * as mysql from 'mysql2/promise';
+import { Client, ClientConfig } from 'pg';
 
 import { assemble } from './assemble';
 import createCompiler from 'named-placeholders';
@@ -12,12 +13,7 @@ type Query = <T>(
 export type ConnectionOptions = mysql.ConnectionOptions;
 
 export type Connection = {
-  query: (
-    sql: string,
-    values: unknown,
-  ) => Promise<[Record<string, unknown>[], unknown]>;
-  execute: (sql: string) => Promise<[Record<string, unknown>[], unknown]>;
-  changeUser: (options: ConnectionOptions) => Promise<void>;
+  query: (sql: string, values?: unknown) => Promise<Record<string, unknown>[]>;
   destroy(): void;
 };
 
@@ -36,14 +32,36 @@ export const createMySqlConnection = async (
   options: ConnectionOptions,
 ): Promise<Connection> => {
   const connection = await mysql.createConnection(options);
-  return connection;
+  return {
+    query: async (sql, values) => {
+      const res = await connection.query(sql, values);
+      return res[0] as Record<string, unknown>[];
+    },
+    destroy: () => connection.destroy(),
+  };
+};
+
+export const createPostgreSqlConnection = async (
+  config?: string | ClientConfig,
+): Promise<Connection> => {
+  const client = new Client(config);
+
+  await client.connect();
+
+  return {
+    query: async (sql, values) => {
+      const res = await client.query(sql, values as unknown[]);
+      return res.rows as unknown as Record<string, unknown>[];
+    },
+    destroy: () => client.end(),
+  };
 };
 
 export const query: Query = async (connection, descriptor) => {
   const { sql, params, identifiers, cast } = descriptor();
   const [unnamedSql, unnamedParams] = toUnnamed(sql, params);
   try {
-    const [rows] = await connection.query(unnamedSql, unnamedParams);
+    const rows = await connection.query(unnamedSql, unnamedParams);
 
     return cast(
       identifiers.length

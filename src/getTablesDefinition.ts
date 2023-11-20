@@ -22,7 +22,7 @@ export const getTablesDefinition = async (
       table_name IN ? AND
       table_schema = ?
   `;
-  const [results] = await connection.query(query, [[tableNames], tableSchema]);
+  const results = await connection.query(query, [[tableNames], tableSchema]);
   results.forEach((row) => {
     const tableName = row.TABLE_NAME as string;
     const columnName = row.COLUMN_NAME as string;
