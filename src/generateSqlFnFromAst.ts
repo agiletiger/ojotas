@@ -1,10 +1,10 @@
 import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
 import { Relations } from './assemble';
 import { getReturnTypeName } from './getReturnTypeName';
-import * as fs from 'node:fs';
+import fs from 'node:fs';
 import { AST, aliasify } from './parser';
 import { getParamsFromAst } from './getParamsFromAst';
-import * as path from 'node:path';
+import path from 'node:path';
 import { getParamsTypeName } from './getParamsTypeName';
 import { getIdentifiers } from './getIdentifiers';
 

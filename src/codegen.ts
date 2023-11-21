@@ -1,8 +1,8 @@
 import 'dotenv/config';
 
 import { globSync } from 'fast-glob';
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'fs';
+import path from 'path';
 
 import { generateSqlFnFromAst } from './generateSqlFnFromAst';
 import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';

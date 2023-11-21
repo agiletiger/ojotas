@@ -1,5 +1,5 @@
 import { describe, it } from 'node:test';
-import * as assert from 'node:assert';
+import assert from 'node:assert';
 
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
 import { astify } from './parser';

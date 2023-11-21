@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
-import * as assert from 'node:assert';
-import * as fs from 'node:fs';
+import assert from 'node:assert';
+import fs from 'node:fs';
 
 import { generateSqlFnFromAst } from './generateSqlFnFromAst';
 import { astify } from './parser';

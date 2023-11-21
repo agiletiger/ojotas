@@ -1,5 +1,5 @@
-import * as fs from 'node:fs';
-import * as mysql from 'mysql2/promise';
+import fs from 'node:fs';
+import mysql from 'mysql2/promise';
 import { Client, ClientConfig } from 'pg';
 
 import { assemble } from './assemble';

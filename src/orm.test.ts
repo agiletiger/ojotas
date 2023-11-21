@@ -1,5 +1,6 @@
+import fs from 'fs';
 import { after, describe, before, it } from 'node:test';
-import * as assert from 'node:assert';
+import assert from 'node:assert';
 import {
   query,
   Descriptor,
@@ -33,38 +34,18 @@ describe('orm', async () => {
       database: process.env.DB_NAME,
     };
     connection = await createMySqlConnection(connectionOptions);
-    await connection.query(`drop table if exists posts;`);
-    await connection.query(`drop table if exists users;`);
-    try {
-      await connection.query(`
-      CREATE TABLE users (
-        id INT AUTO_INCREMENT,
-        name VARCHAR(50) NOT NULL,
-        PRIMARY KEY (id)
-      );
-    `);
-      await connection.query(`
-      CREATE TABLE posts (
-        id INT AUTO_INCREMENT,
-        user_id INT,
-        title VARCHAR(100),
-        content TEXT,
-        PRIMARY KEY (id),
-        FOREIGN KEY (user_id) REFERENCES users(id)
-      );
-    `);
-      await connection.query(`
-      INSERT INTO users (id, name) 
-      VALUES (1, 'Nico'), (2, 'Ivan'), (3, 'Diego');
-    `);
-      await connection.query(`
-      INSERT INTO posts (user_id, title, content) 
-      VALUES (1, 'Nico First Post', 'a'), (1, 'Nico Second Post', 'b'),
-      (2, 'Ivan Third Post', 'c');
-    `);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error(e);
+    const statements = fs
+      .readFileSync('./test/config/my.sql')
+      .toString()
+      .split(';')
+      .slice(0, -1); // last statement is always empty bc of split
+    for await (const statement of statements) {
+      try {
+        await connection.query(statement);
+      } catch (e) {
+        // eslint-disable-next-line no-console
+        console.error(e);
+      }
     }
   });
 
