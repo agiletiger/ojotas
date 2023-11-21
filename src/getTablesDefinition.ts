@@ -4,11 +4,12 @@ import { Connection } from './orm';
 export interface TableDefinition {
   [columnName: string]: ColumnDefinition;
 }
+
 const getEnumNameFromColumn = (dataType: string, columnName: string): string =>
   `${dataType}_${columnName}`;
+
 export const getTablesDefinition = async (
   connection: Connection,
-  tableSchema: string,
   tableNames: string[],
 ): Promise<Record<string, TableDefinition>> => {
   const tableDefinitions: Record<string, TableDefinition> = {};
@@ -19,10 +20,9 @@ export const getTablesDefinition = async (
     FROM 
       information_schema.columns 
     WHERE 
-      table_name IN ? AND
-      table_schema = ?
+      table_name IN ?
   `;
-  const results = await connection.query(query, [[tableNames], tableSchema]);
+  const results = await connection.query(query, [[tableNames]]);
   results.forEach((row) => {
     const tableName = row.TABLE_NAME as string;
     const columnName = row.COLUMN_NAME as string;

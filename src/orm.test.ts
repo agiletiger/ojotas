@@ -1,7 +1,7 @@
 import { after, describe, before, it } from 'node:test';
 import assert from 'node:assert';
 import { query, Descriptor, Connection } from './orm';
-import { getTestConnection } from '../test/helpers/getTestConnection';
+import { getConnection } from './getConnection';
 import { getTestConfigStatements } from '../test/helpers/getTestConfigStatements';
 
 interface ISelectUsersQueryResultItem {
@@ -21,7 +21,9 @@ interface ISelectUsersWithPostsQueryResultItem {
 describe('orm', async () => {
   let connection: Connection;
   before(async () => {
-    connection = await getTestConnection();
+    connection = await getConnection(
+      process.env.DIALECT as 'mysql' | 'postgres' | undefined,
+    );
     const statements = getTestConfigStatements();
     for await (const statement of statements) {
       try {

@@ -9,22 +9,14 @@ import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
 import { getTablesDefinition } from './getTablesDefinition';
-import { MySqlConnectionConfig, createMySqlConnection } from './orm';
+import { getConnection } from './getConnection';
 
 export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
   const files = globSync(path.join(rootPath, '/**/*.sql'));
 
-  const database = process.env.DB_NAME;
-
-  const connectionOptions: MySqlConnectionConfig = {
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  };
-  const connection = await createMySqlConnection(connectionOptions);
+  const connection = await getConnection(ojotasConfig.dialect);
 
   const readFiles = files.map((file) => {
     const sql = fs.readFileSync(file, 'utf8').replace(/\n/g, '');
@@ -47,11 +39,7 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
     ),
   ];
 
-  const tablesDefinition = await getTablesDefinition(
-    connection,
-    database,
-    visitedTables,
-  );
+  const tablesDefinition = await getTablesDefinition(connection, visitedTables);
 
   for await (const { file, basename, ast } of readFiles) {
     const generatedSqlFile = generateSqlFnFromAst(

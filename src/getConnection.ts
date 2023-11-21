@@ -4,10 +4,11 @@ import {
   PostgreSqlConnectionConfig,
   createMySqlConnection,
   createPostgreSqlConnection,
-} from '../../src/orm';
+} from './orm';
 
-export const getTestConnection = async (): Promise<Connection> => {
-  const dialect = process.env.DIALECT as 'mysql' | 'postgres' | undefined;
+export const getConnection = async (
+  dialect: 'mysql' | 'postgres' | undefined,
+): Promise<Connection> => {
   if (dialect === 'mysql') {
     const config: MySqlConnectionConfig = {
       host: process.env.DB_HOST,
