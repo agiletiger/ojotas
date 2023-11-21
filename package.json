@@ -6,7 +6,10 @@
     "lint": "eslint ./src",
     "with-ts": "node -r ts-node/register",
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
-    "test": "npm run with-ts -- --env-file=.env --test ./src/*.test.ts"
+    "test-unit": "npm run with-ts -- --env-file=.env --test $(find ./src -name '*.test.ts' -and -not -name 'orm.test.ts')",
+    "test-mysql": "DIALECT=mysql npm run with-ts -- --env-file=.env --test ./src/orm.test.ts",
+    "test-postgres": "DIALECT=postgres npm run with-ts -- --env-file=.env --test ./src/orm.test.ts",
+    "test": "npm run test-unit && npm run test-mysql && npm run test-postgres"
   },
   "main": "./lib/cjs/orm.js",
   "module": "./lib/esm/orm.js",

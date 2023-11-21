@@ -9,7 +9,7 @@ import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
 import { getTablesDefinition } from './getTablesDefinition';
-import { ConnectionOptions, createMySqlConnection } from './orm';
+import { MySqlConnectionConfig, createMySqlConnection } from './orm';
 
 export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
@@ -18,7 +18,7 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
 
   const database = process.env.DB_NAME;
 
-  const connectionOptions: ConnectionOptions = {
+  const connectionOptions: MySqlConnectionConfig = {
     host: process.env.DB_HOST,
     port: Number(process.env.DB_PORT),
     user: process.env.DB_USER,

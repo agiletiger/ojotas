@@ -10,7 +10,8 @@ type Query = <T>(
   descriptor: Descriptor<T>,
 ) => Promise<T[]>;
 
-export type ConnectionOptions = mysql.ConnectionOptions;
+export type MySqlConnectionConfig = mysql.ConnectionOptions;
+export type PostgreSqlConnectionConfig = string | ClientConfig;
 
 export type Connection = {
   query: (sql: string, values?: unknown) => Promise<Record<string, unknown>[]>;
@@ -29,9 +30,9 @@ const toUnnamed = createCompiler();
 const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
 export const createMySqlConnection = async (
-  options: ConnectionOptions,
+  config: MySqlConnectionConfig,
 ): Promise<Connection> => {
-  const connection = await mysql.createConnection(options);
+  const connection = await mysql.createConnection(config);
   return {
     query: async (sql, values) => {
       const res = await connection.query(sql, values);
@@ -42,7 +43,7 @@ export const createMySqlConnection = async (
 };
 
 export const createPostgreSqlConnection = async (
-  config?: string | ClientConfig,
+  config: PostgreSqlConnectionConfig,
 ): Promise<Connection> => {
   const client = new Client(config);
 

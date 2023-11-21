@@ -1,13 +1,8 @@
-import fs from 'fs';
 import { after, describe, before, it } from 'node:test';
 import assert from 'node:assert';
-import {
-  query,
-  Descriptor,
-  Connection,
-  createMySqlConnection,
-  ConnectionOptions,
-} from './orm';
+import { query, Descriptor, Connection } from './orm';
+import { getTestConnection } from '../test/helpers/getTestConnection';
+import { getTestConfigStatements } from '../test/helpers/getTestConfigStatements';
 
 interface ISelectUsersQueryResultItem {
   id: string;
@@ -26,19 +21,8 @@ interface ISelectUsersWithPostsQueryResultItem {
 describe('orm', async () => {
   let connection: Connection;
   before(async () => {
-    const connectionOptions: ConnectionOptions = {
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-    };
-    connection = await createMySqlConnection(connectionOptions);
-    const statements = fs
-      .readFileSync('./test/config/my.sql')
-      .toString()
-      .split(';')
-      .slice(0, -1); // last statement is always empty bc of split
+    connection = await getTestConnection();
+    const statements = getTestConfigStatements();
     for await (const statement of statements) {
       try {
         await connection.query(statement);
@@ -93,7 +77,7 @@ describe('orm', async () => {
     const descriptor: Descriptor<
       ISelectUsersWithPostsQueryResultItem
     > = () => ({
-      sql: "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
+      sql: 'select u.name as "u.name", p.title as "p.title", p.content as "p.content" from users u inner join posts p on u.id = p.user_id',
       params: null,
       identifiers: ['u.name', 'p.title'],
       cast: (rows: unknown) => {
