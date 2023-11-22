@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
 import { TableDefinition } from './getTablesDefinition';
+import { mapMySqlColumnDefinitionToType } from './mapColumnDefinitionToType';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
@@ -29,6 +30,7 @@ describe('generateReturnTypeFromAst', () => {
   it('should create the type when querying from a single table listing the columns', () => {
     const queryName = 'selectAllUsers';
     const typeDefinition = generateReturnTypeFromAst(
+      mapMySqlColumnDefinitionToType,
       tableDefinitions,
       relations,
       queryName,
@@ -49,6 +51,7 @@ describe('generateReturnTypeFromAst', () => {
   it('should create the type when querying a one to many relation', () => {
     const queryName = 'selectAllUsersWithPosts';
     const typeDefinition = generateReturnTypeFromAst(
+      mapMySqlColumnDefinitionToType,
       tableDefinitions,
       relations,
       queryName,
@@ -74,6 +77,7 @@ describe('generateReturnTypeFromAst', () => {
   it.skip('should create the type when querying a one to many relation (inner join)', () => {
     const queryName = 'selectAllUsersWithPosts';
     const typeDefinition = generateReturnTypeFromAst(
+      mapMySqlColumnDefinitionToType,
       tableDefinitions,
       relations,
       queryName,
@@ -99,6 +103,7 @@ describe('generateReturnTypeFromAst', () => {
   it.skip('should create the type when querying a one to many relation (left join)', () => {
     const queryName = 'selectAllUsersAndPosts';
     const typeDefinition = generateReturnTypeFromAst(
+      mapMySqlColumnDefinitionToType,
       tableDefinitions,
       relations,
       queryName,

@@ -41,7 +41,7 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
 
   const tablesDefinition = await getTablesDefinition(connection, visitedTables);
 
-  for await (const { file, basename, ast } of readFiles) {
+  for (const { file, basename, ast } of readFiles) {
     const generatedSqlFile = generateSqlFnFromAst(
       nodeModulePath,
       ojotasConfig,
@@ -49,11 +49,13 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
       ast,
     );
     const paramsType = generateParamsTypeFromAst(
+      connection.mapColumnDefinitionToType,
       tablesDefinition,
       basename,
       ast,
     );
     const returnType = generateReturnTypeFromAst(
+      connection.mapColumnDefinitionToType,
       tablesDefinition,
       ojotasConfig.relations,
       basename,

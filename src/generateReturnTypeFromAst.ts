@@ -1,11 +1,12 @@
 import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
-import { mapMySqlColumnDefinitionToType } from './mapColumnDefinitionToType';
+import { mapColumnDefinitionToTypeFn } from './mapColumnDefinitionToType';
 import { TableDefinition } from './getTablesDefinition';
 import { Relations } from './assemble';
 import { getReturnTypeName } from './getReturnTypeName';
 import { AST } from './parser';
 
 export const generateReturnTypeFromAst = (
+  mapColumnDefinitionToType: mapColumnDefinitionToTypeFn,
   tableDefinitions: Record<string, TableDefinition>,
   relations: Relations,
   queryName: string,
@@ -19,7 +20,7 @@ export const generateReturnTypeFromAst = (
       .filter(([columnName]) => columns.includes(columnName))
       .map(
         ([columnName, columnDefinition]) =>
-          `${columnName}: ${mapMySqlColumnDefinitionToType(columnDefinition)};`,
+          `${columnName}: ${mapColumnDefinitionToType(columnDefinition)};`,
       )
       .join('\n');
 
