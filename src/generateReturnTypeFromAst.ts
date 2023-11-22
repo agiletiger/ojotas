@@ -1,5 +1,5 @@
 import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
-import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
+import { mapMySqlColumnDefinitionToType } from './mapColumnDefinitionToType';
 import { TableDefinition } from './getTablesDefinition';
 import { Relations } from './assemble';
 import { getReturnTypeName } from './getReturnTypeName';
@@ -19,7 +19,7 @@ export const generateReturnTypeFromAst = (
       .filter(([columnName]) => columns.includes(columnName))
       .map(
         ([columnName, columnDefinition]) =>
-          `${columnName}: ${mapColumnDefinitionToType(columnDefinition)};`,
+          `${columnName}: ${mapMySqlColumnDefinitionToType(columnDefinition)};`,
       )
       .join('\n');
 

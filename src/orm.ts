@@ -3,7 +3,12 @@ import mysql from 'mysql2/promise';
 import { Client, ClientConfig } from 'pg';
 
 import { assemble } from './assemble';
-import createCompiler from 'named-placeholders';
+import createCompiler, { toNumbered } from 'named-placeholders';
+import {
+  mapColumnDefinitionToTypeFn,
+  mapMySqlColumnDefinitionToType,
+  mapPostgreSqlColumnDefinitionToType,
+} from './mapColumnDefinitionToType';
 
 type Query = <T>(
   connection: Connection,
@@ -14,8 +19,13 @@ export type MySqlConnectionConfig = mysql.ConnectionOptions;
 export type PostgreSqlConnectionConfig = string | ClientConfig;
 
 export type Connection = {
-  query: (sql: string, values?: unknown) => Promise<Record<string, unknown>[]>;
+  query: (
+    sql: string,
+    values?: Record<string, unknown>,
+  ) => Promise<Record<string, unknown>[]>;
   destroy(): void;
+  mapColumnDefinitionToType: mapColumnDefinitionToTypeFn;
+  columnsInfoSql: string;
 };
 
 export type Descriptor<T> = () => {
@@ -34,11 +44,19 @@ export const createMySqlConnection = async (
 ): Promise<Connection> => {
   const connection = await mysql.createConnection(config);
   return {
-    query: async (sql, values) => {
-      const res = await connection.query(sql, values);
+    query: async (sql, params) => {
+      const [unnamedSql, unnamedParams] = toUnnamed(sql, params);
+      const res = await connection.query(unnamedSql, unnamedParams);
       return res[0] as Record<string, unknown>[];
     },
     destroy: () => connection.destroy(),
+    mapColumnDefinitionToType: mapMySqlColumnDefinitionToType,
+    columnsInfoSql: `SELECT 
+      table_name AS 'table', column_name AS 'column', data_type AS 'type', is_nullable AS 'nullable'
+    FROM 
+      information_schema.columns 
+    WHERE 
+      table_name IN :tableNames AND table_schema != 'performance_schema'`,
   };
 };
 
@@ -50,19 +68,26 @@ export const createPostgreSqlConnection = async (
   await client.connect();
 
   return {
-    query: async (sql, values) => {
-      const res = await client.query(sql, values as unknown[]);
+    query: async (sql, params) => {
+      const [numberedSql, numberedParams] = toNumbered(sql, params);
+      const res = await client.query(numberedSql, numberedParams);
       return res.rows as unknown as Record<string, unknown>[];
     },
     destroy: () => client.end(),
+    mapColumnDefinitionToType: mapPostgreSqlColumnDefinitionToType,
+    columnsInfoSql: `SELECT 
+      table_name AS "table", column_name AS "column", data_type AS "type", is_nullable AS "nullable"
+    FROM 
+      information_schema.columns 
+    WHERE 
+      table_name IN :tableNames`,
   };
 };
 
 export const query: Query = async (connection, descriptor) => {
   const { sql, params, identifiers, cast } = descriptor();
-  const [unnamedSql, unnamedParams] = toUnnamed(sql, params);
   try {
-    const rows = await connection.query(unnamedSql, unnamedParams);
+    const rows = await connection.query(sql, params);
 
     return cast(
       identifiers.length
@@ -76,10 +101,7 @@ export const query: Query = async (connection, descriptor) => {
     );
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(
-      `Error executing query: ${unnamedSql} with params ${unnamedParams}`,
-      error,
-    );
+    console.error(`Error executing query: ${sql} with params ${params}`, error);
     throw error;
   }
 };

@@ -1,5 +1,5 @@
 import { TableDefinition } from './getTablesDefinition';
-import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
+import { mapMySqlColumnDefinitionToType } from './mapColumnDefinitionToType';
 import { getParamsFromAst } from './getParamsFromAst';
 import { AST } from './parser';
 import { getParamsTypeName } from './getParamsTypeName';
@@ -18,9 +18,9 @@ export const generateParamsTypeFromAst = (
       ([columnName]) => columnName === param.column,
     )[1];
     mappedParams.push(
-      `${param.name}${param.optional ? '?' : ''}: ${mapColumnDefinitionToType(
-        columnDefinition,
-      )};`,
+      `${param.name}${
+        param.optional ? '?' : ''
+      }: ${mapMySqlColumnDefinitionToType(columnDefinition)};`,
     );
   }
 
