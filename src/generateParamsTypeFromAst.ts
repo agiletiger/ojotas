@@ -1,10 +1,11 @@
 import { TableDefinition } from './getTablesDefinition';
-import { mapColumnDefinitionToType } from './mapColumnDefinitionToType';
+import { mapColumnDefinitionToTypeFn } from './mapColumnDefinitionToType';
 import { getParamsFromAst } from './getParamsFromAst';
 import { AST } from './parser';
 import { getParamsTypeName } from './getParamsTypeName';
 
 export const generateParamsTypeFromAst = (
+  mapColumnDefinitionToType: mapColumnDefinitionToTypeFn,
   tableDefinitions: Record<string, TableDefinition>,
   queryName: string,
   ast: AST,

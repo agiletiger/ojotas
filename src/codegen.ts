@@ -1,35 +1,27 @@
 import 'dotenv/config';
 
 import { globSync } from 'fast-glob';
-import * as fs from 'fs';
-import * as path from 'path';
-import * as mysql from 'mysql2/promise';
+import fs from 'fs';
+import path from 'path';
 
 import { generateSqlFnFromAst } from './generateSqlFnFromAst';
 import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
 import { astify } from './parser';
 import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
 import { getTablesDefinition } from './getTablesDefinition';
+import { getConnection } from './getConnection';
 
 export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
   const files = globSync(path.join(rootPath, '/**/*.sql'));
 
-  const database = process.env.DB_NAME;
-
-  const connectionOptions: mysql.ConnectionOptions = {
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  };
-  const connection = await mysql.createConnection(connectionOptions);
+  const connection = await getConnection(ojotasConfig.dialect);
 
   const readFiles = files.map((file) => {
     const sql = fs.readFileSync(file, 'utf8').replace(/\n/g, '');
     const basename = path.basename(file, '.sql');
-    const ast = astify(sql);
+    const ast = astify(ojotasConfig.dialect, sql);
     return { file, basename, ast };
   });
 
@@ -47,13 +39,9 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
     ),
   ];
 
-  const tablesDefinition = await getTablesDefinition(
-    connection,
-    database,
-    visitedTables,
-  );
+  const tablesDefinition = await getTablesDefinition(connection, visitedTables);
 
-  for await (const { file, basename, ast } of readFiles) {
+  for (const { file, basename, ast } of readFiles) {
     const generatedSqlFile = generateSqlFnFromAst(
       nodeModulePath,
       ojotasConfig,
@@ -61,11 +49,13 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
       ast,
     );
     const paramsType = generateParamsTypeFromAst(
+      connection.mapColumnDefinitionToType,
       tablesDefinition,
       basename,
       ast,
     );
     const returnType = generateReturnTypeFromAst(
+      connection.mapColumnDefinitionToType,
       tablesDefinition,
       ojotasConfig.relations,
       basename,

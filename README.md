@@ -39,16 +39,16 @@ There is a side repo [ojotas-test-app](https://github.com/agiletiger/ojotas-test
 
 ## Roadmap
 ### V1
-- [] support query method
-- [] define how to specify the unique identifiers for each entity when including relations
-- [] create TS types from the queries
-- [] check queries in a compile step against the database
-- [] support sql intellisense in vscode
+- [x] support query method
+- [ ] define how to specify the unique identifiers for each entity when including relations
+- [x] create TS types from the queries
+- [ ] check queries in a compile step against the database
+- [ ] support sql intellisense in vscode
 
 ### V2
-- [] remove the need to specify aliases manually.
-- [] support more dialects than MySQL
-- [] support sql intellisense in different IDEs
+- [ ] remove the need to specify aliases manually.
+- [ ] support more dialects
+- [ ] support sql intellisense in different IDEs
 
 
 ## Example 

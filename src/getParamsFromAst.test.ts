@@ -1,107 +1,165 @@
-import { describe, it } from 'node:test';
-import * as assert from 'node:assert';
+import { describe, it } from '../test/test-utils';
+import assert from 'node:assert';
 
 import { getParamsFromAst } from './getParamsFromAst';
 import { astify } from './parser';
+import { Dialect } from './orm';
 
 // TODO: use fast-check here to generate more combinations
 describe('getParamsFromAst', () => {
   describe('select', () => {
-    it('should return empty when no params', () => {
+    it.each([
+      { dialect: 'mysql' as Dialect },
+      { dialect: 'postgres' as Dialect },
+    ])('$dialect - should return empty when no params', ({ dialect }) => {
       assert.deepEqual(
-        getParamsFromAst(astify('select id, name from users')),
+        getParamsFromAst(astify(dialect, 'select id, name from users')),
         [],
       );
     });
 
-    it('should throw error if querying from multiple tables and not using aliases', () => {
-      assert.throws(() =>
-        getParamsFromAst(
-          astify(
-            'select id, name from users join posts on users.id = posts.user_id where name like :name',
+    it.each([
+      { dialect: 'mysql' as Dialect },
+      { dialect: 'postgres' as Dialect },
+    ])(
+      '$dialect - should throw error if querying from multiple tables and not using aliases',
+      ({ dialect }) => {
+        assert.throws(() =>
+          getParamsFromAst(
+            astify(
+              dialect,
+              'select id, name from users join posts on users.id = posts.user_id where name like :name',
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
 
-    it('should detect optional param in where statement', () => {
-      assert.deepEqual(
-        getParamsFromAst(
-          astify('select id, name from users where name like :name?'),
-        ),
-        [{ name: 'name', optional: true, table: 'users', column: 'name' }],
-      );
-    });
-
-    it('should detect many optional params in where statement', () => {
-      assert.deepEqual(
-        getParamsFromAst(
-          astify(
-            'select id, name from users where name like :name? and id > :id?',
+    it.each([
+      { dialect: 'mysql' as Dialect },
+      { dialect: 'postgres' as Dialect },
+    ])(
+      '$dialect - should detect optional param in where statement',
+      ({ dialect }) => {
+        assert.deepEqual(
+          getParamsFromAst(
+            astify(
+              dialect,
+              'select id, name from users where name like :name?',
+            ),
           ),
-        ),
-        [
-          { name: 'name', optional: true, table: 'users', column: 'name' },
-          { name: 'id', optional: true, table: 'users', column: 'id' },
-        ],
-      );
-    });
+          [{ name: 'name', optional: true, table: 'users', column: 'name' }],
+        );
+      },
+    );
 
-    it('should detect mandatory param in where statement', () => {
-      assert.deepEqual(
-        getParamsFromAst(
-          astify('select id, name from users where name like :name'),
-        ),
-        [{ name: 'name', optional: false, table: 'users', column: 'name' }],
-      );
-    });
-
-    it('should detect mandatory param in where statement after a join', () => {
-      assert.deepEqual(
-        getParamsFromAst(
-          astify(
-            'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id where p.title like :title',
+    it.each([
+      { dialect: 'mysql' as Dialect },
+      { dialect: 'postgres' as Dialect },
+    ])(
+      '$dialect - should detect many optional params in where statement',
+      ({ dialect }) => {
+        assert.deepEqual(
+          getParamsFromAst(
+            astify(
+              dialect,
+              'select id, name from users where name like :name? and id > :id?',
+            ),
           ),
-        ),
-        [{ name: 'title', optional: false, table: 'posts', column: 'title' }],
-      );
-    });
+          [
+            { name: 'name', optional: true, table: 'users', column: 'name' },
+            { name: 'id', optional: true, table: 'users', column: 'id' },
+          ],
+        );
+      },
+    );
 
-    it('should detect many mandatory params in where statement', () => {
-      assert.deepEqual(
-        getParamsFromAst(
-          astify(
-            'select id, name from users where name like :name and id > :id',
+    it.each([
+      { dialect: 'mysql' as Dialect },
+      { dialect: 'postgres' as Dialect },
+    ])(
+      '$dialect - should detect mandatory param in where statement',
+      ({ dialect }) => {
+        assert.deepEqual(
+          getParamsFromAst(
+            astify(dialect, 'select id, name from users where name like :name'),
           ),
-        ),
-        [
-          { name: 'name', optional: false, table: 'users', column: 'name' },
-          { name: 'id', optional: false, table: 'users', column: 'id' },
-        ],
-      );
-    });
+          [{ name: 'name', optional: false, table: 'users', column: 'name' }],
+        );
+      },
+    );
 
-    it('should detect mixed params in where statement', () => {
-      assert.deepEqual(
-        getParamsFromAst(
-          astify(
-            'select id, name from users where name like :name and id > :id or age < :age?',
+    it.each([
+      { dialect: 'mysql' as Dialect },
+      { dialect: 'postgres' as Dialect },
+    ])(
+      '$dialect - should detect mandatory param in where statement after a join',
+      ({ dialect }) => {
+        assert.deepEqual(
+          getParamsFromAst(
+            astify(
+              dialect,
+              'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id where p.title like :title',
+            ),
           ),
-        ),
-        [
-          { name: 'name', optional: false, table: 'users', column: 'name' },
-          { name: 'id', optional: false, table: 'users', column: 'id' },
-          { name: 'age', optional: true, table: 'users', column: 'age' },
-        ],
-      );
-    });
+          [{ name: 'title', optional: false, table: 'posts', column: 'title' }],
+        );
+      },
+    );
+
+    it.each([
+      { dialect: 'mysql' as Dialect },
+      { dialect: 'postgres' as Dialect },
+    ])(
+      '$dialect - should detect many mandatory params in where statement',
+      ({ dialect }) => {
+        assert.deepEqual(
+          getParamsFromAst(
+            astify(
+              dialect,
+              'select id, name from users where name like :name and id > :id',
+            ),
+          ),
+          [
+            { name: 'name', optional: false, table: 'users', column: 'name' },
+            { name: 'id', optional: false, table: 'users', column: 'id' },
+          ],
+        );
+      },
+    );
+
+    it.each([
+      { dialect: 'mysql' as Dialect },
+      { dialect: 'postgres' as Dialect },
+    ])(
+      '$dialect - should detect mixed params in where statement',
+      ({ dialect }) => {
+        assert.deepEqual(
+          getParamsFromAst(
+            astify(
+              dialect,
+              'select id, name from users where name like :name and id > :id or age < :age?',
+            ),
+          ),
+          [
+            { name: 'name', optional: false, table: 'users', column: 'name' },
+            { name: 'id', optional: false, table: 'users', column: 'id' },
+            { name: 'age', optional: true, table: 'users', column: 'age' },
+          ],
+        );
+      },
+    );
   });
 
   describe('insert', () => {
-    it('should detect named params in values', () => {
+    it.each([
+      { dialect: 'mysql' as Dialect },
+      { dialect: 'postgres' as Dialect },
+    ])('$dialect - should detect named params in values', ({ dialect }) => {
       assert.deepEqual(
         getParamsFromAst(
           astify(
+            dialect,
             'INSERT INTO users (name, email, age) VALUES (:name, :email, :age)',
           ),
         ),
@@ -113,10 +171,29 @@ describe('getParamsFromAst', () => {
       );
     });
 
-    it('should detect unnamed params in values', () => {
+    it('mysql - should detect unnamed params in values', () => {
       assert.deepEqual(
         getParamsFromAst(
-          astify('INSERT INTO users (name, email, age) VALUES (?, ?, ?)'),
+          astify(
+            'mysql',
+            'INSERT INTO users (name, email, age) VALUES (?, ?, ?)',
+          ),
+        ),
+        [
+          { name: 'name', optional: false, table: 'users', column: 'name' },
+          { name: 'email', optional: false, table: 'users', column: 'email' },
+          { name: 'age', optional: false, table: 'users', column: 'age' },
+        ],
+      );
+    });
+
+    it('postgres - should detect unnamed params in values', () => {
+      assert.deepEqual(
+        getParamsFromAst(
+          astify(
+            'postgres',
+            'INSERT INTO users (name, email, age) VALUES ($1, $2, $3)',
+          ),
         ),
         [
           { name: 'name', optional: false, table: 'users', column: 'name' },
