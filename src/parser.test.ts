@@ -29,5 +29,11 @@ describe('parser', () => {
         'SELECT `u`.`name` AS `u.name`, `p`.`title` AS `p.title`, `p`.`content` AS `p.content` FROM `users` AS `u` INNER JOIN `posts` AS `p` ON `u`.`id` = `p`.`user_id`',
       );
     });
+    it('should handle sql ending with semicolon correctly', () => {
+      assert.equal(
+        aliasify(astify('select id, name from users;')),
+        'SELECT `id`, `name` FROM `users`;',
+      );
+    });
   });
 });
