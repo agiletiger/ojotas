@@ -1,23 +1,33 @@
-import { describe, it } from 'node:test';
+import { describe, it } from '../test/test-utils';
 import assert from 'node:assert';
 
 import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
 import { astify } from './parser';
+import { Dialect } from './orm';
 
 describe('getSelectedColumnsFromAst', () => {
-  it('should work for a single table', () => {
+  it.each([
+    { dialect: 'mysql' as Dialect },
+    { dialect: 'postgres' as Dialect },
+  ])('$dialect - should work for a single table', ({ dialect }) => {
     assert.deepEqual(
-      getSelectedColumnsFromAst(astify('select u.id, u.name from users u')),
+      getSelectedColumnsFromAst(
+        astify(dialect, 'select u.id, u.name from users u'),
+      ),
       {
         users: ['id', 'name'],
       },
     );
   });
 
-  it('should work for two tables', () => {
+  it.each([
+    { dialect: 'mysql' as Dialect },
+    { dialect: 'postgres' as Dialect },
+  ])('$dialect - should work for two tables', ({ dialect }) => {
     assert.deepEqual(
       getSelectedColumnsFromAst(
         astify(
+          dialect,
           'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id',
         ),
       ),

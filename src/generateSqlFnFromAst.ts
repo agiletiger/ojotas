@@ -7,10 +7,15 @@ import { getParamsFromAst } from './getParamsFromAst';
 import path from 'node:path';
 import { getParamsTypeName } from './getParamsTypeName';
 import { getIdentifiers } from './getIdentifiers';
+import { Dialect } from './orm';
 
 export const generateSqlFnFromAst = (
   rootPath: string, // I'm passing this so same function can work with local tests and inside node_modules. Not sure this is the right way..
-  ojotasConfig: { aliases: Record<string, string>; relations: Relations },
+  ojotasConfig: {
+    aliases: Record<string, string>;
+    relations: Relations;
+    dialect: Dialect;
+  },
   queryName: string,
   ast: AST,
 ) => {
@@ -29,7 +34,7 @@ export const generateSqlFnFromAst = (
   if (params.length) {
     return queryWithParams
       .replace('$queryName$', queryName)
-      .replace('$sql$', aliasify(ast))
+      .replace('$sql$', aliasify(ojotasConfig.dialect, ast))
       .replace('$identifiers$', JSON.stringify(identifiers))
       .replace('$paramsTypeName$', getParamsTypeName(queryName))
       .replace('$returnTypeName$', getReturnTypeName(queryName))
@@ -37,7 +42,7 @@ export const generateSqlFnFromAst = (
   } else {
     return queryWithoutParams
       .replace('$queryName$', queryName)
-      .replace('$sql$', aliasify(ast))
+      .replace('$sql$', aliasify(ojotasConfig.dialect, ast))
       .replace('$identifiers$', JSON.stringify(identifiers))
       .replace('$returnTypeName$', getReturnTypeName(queryName))
       .replace('// @ts-nocheck', '');

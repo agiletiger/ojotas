@@ -21,7 +21,7 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const readFiles = files.map((file) => {
     const sql = fs.readFileSync(file, 'utf8').replace(/\n/g, '');
     const basename = path.basename(file, '.sql');
-    const ast = astify(sql);
+    const ast = astify(ojotasConfig.dialect, sql);
     return { file, basename, ast };
   });
 

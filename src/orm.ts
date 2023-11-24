@@ -17,6 +17,7 @@ type Query = <T>(
 
 export type MySqlConnectionConfig = mysql.ConnectionOptions;
 export type PostgreSqlConnectionConfig = string | ClientConfig;
+export type Dialect = 'mysql' | 'postgres';
 
 export type Connection = {
   query: (
@@ -76,11 +77,11 @@ export const createPostgreSqlConnection = async (
     destroy: () => client.end(),
     mapColumnDefinitionToType: mapPostgreSqlColumnDefinitionToType,
     columnsInfoSql: `SELECT 
-      table_name AS "table", column_name AS "column", data_type AS "type", is_nullable AS "nullable"
+      table_name AS "table", column_name AS "column", udt_name AS "type", is_nullable AS "nullable"
     FROM 
       information_schema.columns 
     WHERE 
-      table_name IN :tableNames`,
+      table_name = ANY(:tableNames)`,
   };
 };
 

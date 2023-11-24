@@ -7,14 +7,14 @@ describe('parser', () => {
   describe('aliasify', () => {
     it('should do nothing when selecting * from one table', () => {
       assert.equal(
-        aliasify(astify('select * from users')),
+        aliasify('mysql', astify('mysql', 'select * from users')),
         'SELECT * FROM `users`',
       );
     });
 
     it('should not add aliases when selecting from a single table', () => {
       assert.equal(
-        aliasify(astify('select id, name from users')),
+        aliasify('mysql', astify('mysql', 'select id, name from users')),
         'SELECT `id`, `name` FROM `users`',
       );
     });
@@ -22,7 +22,9 @@ describe('parser', () => {
     it('should alias when there are no aliases present in query', () => {
       assert.equal(
         aliasify(
+          'mysql',
           astify(
+            'mysql',
             'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id',
           ),
         ),
