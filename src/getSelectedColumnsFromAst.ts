@@ -23,5 +23,10 @@ export const getSelectedColumnsFromAst = (ast: AST) => {
     return { [from]: ast.returning.columns.map((c) => c.expr.column) };
   }
 
+  if (ast.type === 'insert' && ast.returning) {
+    const from = (ast.table[0] as From).table;
+    return { [from]: ast.returning.columns.map((c) => c.expr.column) };
+  }
+
   return {};
 };

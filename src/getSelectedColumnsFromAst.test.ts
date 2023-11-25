@@ -51,4 +51,18 @@ describe('getSelectedColumnsFromAst', () => {
       },
     );
   });
+
+  it('postgres - should support returning in insert statements', () => {
+    assert.deepEqual(
+      getSelectedColumnsFromAst(
+        astify(
+          'postgres',
+          'insert into users (name) values ("eze") returning id',
+        ),
+      ),
+      {
+        users: ['id'],
+      },
+    );
+  });
 });
