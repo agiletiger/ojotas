@@ -18,5 +18,10 @@ export const getSelectedColumnsFromAst = (ast: AST) => {
     );
   }
 
+  if (ast.type === 'update' && ast.returning) {
+    const from = (ast.table[0] as From).table;
+    return { [from]: ast.returning.columns.map((c) => c.expr.column) };
+  }
+
   return {};
 };

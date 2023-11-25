@@ -37,4 +37,18 @@ describe('getSelectedColumnsFromAst', () => {
       },
     );
   });
+
+  it('postgres - should support returning in update statements', () => {
+    assert.deepEqual(
+      getSelectedColumnsFromAst(
+        astify(
+          'postgres',
+          'update users set name = "nico" where id = 1 returning id',
+        ),
+      ),
+      {
+        users: ['id'],
+      },
+    );
+  });
 });
