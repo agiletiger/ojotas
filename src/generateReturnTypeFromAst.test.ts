@@ -69,7 +69,7 @@ describe('generateReturnTypeFromAst', () => {
         queryName,
         astify(
           dialect,
-          "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
+          'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id',
         ),
       );
 
@@ -102,7 +102,7 @@ describe('generateReturnTypeFromAst', () => {
   //       queryName,
   //       astify(
   //         dialect,
-  //         "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u inner join posts p on u.id = p.user_id",
+  //         "select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id",
   //       ),
   //     );
 
@@ -135,7 +135,7 @@ describe('generateReturnTypeFromAst', () => {
   //       queryName,
   //       astify(
   //         dialect,
-  //         "select u.name as 'u.name', p.title as 'p.title', p.content as 'p.content' from users u left join posts p on u.id = p.user_id",
+  //         "select u.name, p.title, p.content from users u left join posts p on u.id = p.user_id",
   //       ),
   //     );
 
