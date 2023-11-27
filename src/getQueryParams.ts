@@ -1,21 +1,6 @@
-import { ColumnRef, From } from 'node-sql-parser';
+import { ColumnRef, Expr, From, Param } from 'node-sql-parser';
 import { AST } from './parser';
-
-// types are not provided https://github.com/taozhi8833998/node-sql-parser/issues/1662
-type Param = { type: 'param'; value: string };
-type Expr =
-  | {
-      type: 'binary_expr';
-      operator: 'AND' | 'OR';
-      left: Expr;
-      right: Expr;
-    }
-  | {
-      type: 'binary_expr';
-      operator: string;
-      left: ColumnRef | Param;
-      right: ColumnRef | Param;
-    };
+import { ModelTypes, TsType } from './mapSqlTypeToTsType';
 
 const getParamBranch = (expr: Expr) =>
   expr.left.type === 'param'
@@ -57,9 +42,18 @@ const getParamsFromExpr = (
   );
 };
 
-export const getParamsFromAst = (
+export type QueryParam = {
+  name: string;
+  optional: boolean;
+  type: TsType;
+  column: string;
+  table: string;
+};
+
+export const getQueryParams = (
+  modelTypes: ModelTypes,
   ast: AST,
-): { name: string; optional: boolean; column: string; table: string }[] => {
+): QueryParam[] => {
   if (ast.type === 'select' && ast.where) {
     const whereParams = getParamsFromExpr(ast.where, ast.from);
 
@@ -78,6 +72,7 @@ export const getParamsFromAst = (
       column,
       table,
       optional: ast.optionalParams.includes(name),
+      type: modelTypes[table][column].type,
     }));
   }
 
@@ -85,12 +80,12 @@ export const getParamsFromAst = (
     const table = ast.table[0].table;
     const params = ast.values[0].value;
 
-    // console.dir(ast, { depth: null });
     return ast.columns.map((column, index) => ({
       table,
       column,
       optional: false,
       name: params[index].type === 'param' ? params[index].value : column,
+      type: modelTypes[table][column]?.type,
     }));
   }
   return [];

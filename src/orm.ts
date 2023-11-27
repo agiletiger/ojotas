@@ -5,10 +5,10 @@ import { Client, ClientConfig } from 'pg';
 import { assemble } from './assemble';
 import createCompiler, { toNumbered } from 'named-placeholders';
 import {
-  mapColumnDefinitionToTypeFn,
-  mapMySqlColumnDefinitionToType,
-  mapPostgreSqlColumnDefinitionToType,
-} from './mapColumnDefinitionToType';
+  MapSqlTypeToTsTypeFn,
+  mapMySqlTypeToTsType,
+  mapPostgreSqlTypeToTsType,
+} from './mapSqlTypeToTsType';
 
 type Query = <T>(
   connection: Connection,
@@ -24,8 +24,8 @@ export type Connection = {
     sql: string,
     values?: Record<string, unknown>,
   ) => Promise<Record<string, unknown>[]>;
-  destroy(): void;
-  mapColumnDefinitionToType: mapColumnDefinitionToTypeFn;
+  destroy(): Promise<void>;
+  mapMySqlTypeToTsType: MapSqlTypeToTsTypeFn;
   columnsInfoSql: string;
 };
 
@@ -50,8 +50,8 @@ export const createMySqlConnection = async (
       const res = await connection.query(unnamedSql, unnamedParams);
       return res[0] as Record<string, unknown>[];
     },
-    destroy: () => connection.destroy(),
-    mapColumnDefinitionToType: mapMySqlColumnDefinitionToType,
+    destroy: async () => connection.destroy(),
+    mapMySqlTypeToTsType: mapMySqlTypeToTsType,
     columnsInfoSql: `SELECT 
       table_name AS 'table', column_name AS 'column', data_type AS 'type', is_nullable AS 'nullable'
     FROM 
@@ -74,8 +74,8 @@ export const createPostgreSqlConnection = async (
       const res = await client.query(numberedSql, numberedParams);
       return res.rows as unknown as Record<string, unknown>[];
     },
-    destroy: () => client.end(),
-    mapColumnDefinitionToType: mapPostgreSqlColumnDefinitionToType,
+    destroy: async () => client.end(),
+    mapMySqlTypeToTsType: mapPostgreSqlTypeToTsType,
     columnsInfoSql: `SELECT 
       table_name AS "table", column_name AS "column", udt_name AS "type", is_nullable AS "nullable"
     FROM 

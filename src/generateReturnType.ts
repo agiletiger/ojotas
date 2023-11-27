@@ -1,26 +1,19 @@
-import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
-import { mapColumnDefinitionToTypeFn } from './mapColumnDefinitionToType';
-import { TableDefinition } from './getTablesDefinition';
+import { ReturnColumns } from './getReturnColumns';
 import { Relations } from './assemble';
 import { getReturnTypeName } from './getReturnTypeName';
-import { AST } from './parser';
 
-export const generateReturnTypeFromAst = (
-  mapColumnDefinitionToType: mapColumnDefinitionToTypeFn,
-  tableDefinitions: Record<string, TableDefinition>,
+export const generateReturnType = (
   relations: Relations,
   queryName: string,
-  ast: AST,
+  selectedColumns: ReturnColumns,
 ) => {
   const tableTypes: { table: string; types: string }[] = [];
 
-  const selectedColumns = getSelectedColumnsFromAst(ast);
   for (const [table, columns] of Object.entries(selectedColumns)) {
-    const types = Object.entries(tableDefinitions[table])
-      .filter(([columnName]) => columns.includes(columnName))
+    const types = columns
       .map(
-        ([columnName, columnDefinition]) =>
-          `${columnName}: ${mapColumnDefinitionToType(columnDefinition)};`,
+        (column) =>
+          `${column.name}${column.nullable ? '?' : ''}: ${column.type};`,
       )
       .join('\n');
 

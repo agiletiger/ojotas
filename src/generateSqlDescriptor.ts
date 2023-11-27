@@ -1,16 +1,18 @@
-import { getSelectedColumnsFromAst } from './getSelectedColumnsFromAst';
+import { getReturnColumns } from './getReturnColumns';
 import { Relations } from './assemble';
 import { getReturnTypeName } from './getReturnTypeName';
 import fs from 'node:fs';
 import { AST, aliasify } from './parser';
-import { getParamsFromAst } from './getParamsFromAst';
+import { getQueryParams } from './getQueryParams';
 import path from 'node:path';
 import { getParamsTypeName } from './getParamsTypeName';
 import { getIdentifiers } from './getIdentifiers';
 import { Dialect } from './orm';
+import { ModelTypes } from './mapSqlTypeToTsType';
 
-export const generateSqlFnFromAst = (
+export const generateSqlDescriptor = (
   rootPath: string, // I'm passing this so same function can work with local tests and inside node_modules. Not sure this is the right way..
+  modelTypes: ModelTypes,
   ojotasConfig: {
     aliases: Record<string, string>;
     relations: Relations;
@@ -26,12 +28,12 @@ export const generateSqlFnFromAst = (
     .readFileSync(path.join(rootPath, '../templates/query-with-params.ts'))
     .toString();
 
-  const selectedColumns = getSelectedColumnsFromAst(ast);
+  const returnColumns = getReturnColumns(modelTypes, ast);
   // TODO: refactor. getParamsFromAst is also called in codegen
-  const params = getParamsFromAst(ast);
-  const identifiers = getIdentifiers(ojotasConfig.aliases, selectedColumns);
+  const queryParams = getQueryParams(modelTypes, ast);
+  const identifiers = getIdentifiers(ojotasConfig.aliases, returnColumns);
 
-  if (params.length) {
+  if (queryParams.length) {
     return queryWithParams
       .replace('$queryName$', queryName)
       .replace('$sql$', aliasify(ojotasConfig.dialect, ast))

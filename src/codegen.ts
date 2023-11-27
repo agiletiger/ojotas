@@ -4,12 +4,14 @@ import { globSync } from 'fast-glob';
 import fs from 'fs';
 import path from 'path';
 
-import { generateSqlFnFromAst } from './generateSqlFnFromAst';
-import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
+import { generateSqlDescriptor } from './generateSqlDescriptor';
+import { generateReturnType } from './generateReturnType';
 import { astify } from './parser';
-import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
-import { getTablesDefinition } from './getTablesDefinition';
+import { generateQueryParamsType } from './generateQueryParamsType';
+import { getSchemaTypes } from './getSchemaTypes';
 import { getConnection } from './getConnection';
+import { getQueryParams } from './getQueryParams';
+import { getReturnColumns } from './getReturnColumns';
 
 export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
@@ -39,27 +41,43 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
     ),
   ];
 
-  const tablesDefinition = await getTablesDefinition(connection, visitedTables);
+  const schemaTypes = await getSchemaTypes(connection, visitedTables);
+
+  // this happens when you don't have lenses
+  const modelTypes = Object.fromEntries(
+    Object.entries(schemaTypes).map(([tableName, columns]) => {
+      return [
+        tableName,
+        Object.fromEntries(
+          Object.entries(columns).map(([columnName, { type, nullable }]) => [
+            columnName,
+            {
+              type: connection.mapMySqlTypeToTsType(type),
+              nullable,
+            },
+          ]),
+        ),
+      ];
+    }),
+  );
 
   for (const { file, basename, ast } of readFiles) {
-    const generatedSqlFile = generateSqlFnFromAst(
+    const generatedSqlFile = generateSqlDescriptor(
       nodeModulePath,
+      modelTypes,
       ojotasConfig,
       basename,
       ast,
     );
-    const paramsType = generateParamsTypeFromAst(
-      connection.mapColumnDefinitionToType,
-      tablesDefinition,
+
+    const paramsType = generateQueryParamsType(
       basename,
-      ast,
+      getQueryParams(modelTypes, ast),
     );
-    const returnType = generateReturnTypeFromAst(
-      connection.mapColumnDefinitionToType,
-      tablesDefinition,
+    const returnType = generateReturnType(
       ojotasConfig.relations,
       basename,
-      ast,
+      getReturnColumns(modelTypes, ast),
     );
     const outputPath = path.join(path.dirname(file), basename + '.sql.ts');
     fs.writeFileSync(
