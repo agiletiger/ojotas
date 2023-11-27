@@ -1,12 +1,13 @@
 import { describe, it } from '../test/test-utils';
 import assert from 'node:assert';
 
-import { ModelTypes, getReturnColumns } from './getReturnColumns';
+import { getReturnColumns } from './getReturnColumns';
 import { astify } from './parser';
 import { Dialect } from './orm';
+import { ModelTypes } from './mapSqlTypeToTsType';
 
 describe('getReturnColumns', () => {
-  const types: ModelTypes = {
+  const modelTypes: ModelTypes = {
     users: {
       id: { type: 'number', nullable: false },
       name: { type: 'string', nullable: false },
@@ -29,7 +30,7 @@ describe('getReturnColumns', () => {
   ])('$dialect - should work for a single table', ({ dialect }) => {
     assert.deepEqual(
       getReturnColumns(
-        types,
+        modelTypes,
         astify(dialect, 'select u.id, u.name from users u'),
       ),
       {
@@ -59,7 +60,7 @@ describe('getReturnColumns', () => {
   ])('$dialect - should work for two tables', ({ dialect }) => {
     assert.deepEqual(
       getReturnColumns(
-        types,
+        modelTypes,
         astify(
           dialect,
           'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id',
@@ -78,7 +79,7 @@ describe('getReturnColumns', () => {
   it('postgres - should support returning in update statements', () => {
     assert.deepEqual(
       getReturnColumns(
-        types,
+        modelTypes,
         astify(
           'postgres',
           'update users set name = "nico" where id = 1 returning id',
@@ -93,7 +94,7 @@ describe('getReturnColumns', () => {
   it('postgres - should support returning in insert statements', () => {
     assert.deepEqual(
       getReturnColumns(
-        types,
+        modelTypes,
         astify(
           'postgres',
           'insert into users (name) values ("eze") returning id',

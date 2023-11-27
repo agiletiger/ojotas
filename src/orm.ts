@@ -5,10 +5,10 @@ import { Client, ClientConfig } from 'pg';
 import { assemble } from './assemble';
 import createCompiler, { toNumbered } from 'named-placeholders';
 import {
-  mapColumnDefinitionToTypeFn,
-  mapMySqlColumnDefinitionToType,
-  mapPostgreSqlColumnDefinitionToType,
-} from './mapColumnDefinitionToType';
+  MapSqlTypeToTsTypeFn,
+  mapMySqlTypeToTsType,
+  mapPostgreSqlTypeToTsType,
+} from './mapSqlTypeToTsType';
 
 type Query = <T>(
   connection: Connection,
@@ -25,7 +25,7 @@ export type Connection = {
     values?: Record<string, unknown>,
   ) => Promise<Record<string, unknown>[]>;
   destroy(): void;
-  mapColumnDefinitionToType: mapColumnDefinitionToTypeFn;
+  mapColumnDefinitionToType: MapSqlTypeToTsTypeFn;
   columnsInfoSql: string;
 };
 
@@ -51,7 +51,7 @@ export const createMySqlConnection = async (
       return res[0] as Record<string, unknown>[];
     },
     destroy: () => connection.destroy(),
-    mapColumnDefinitionToType: mapMySqlColumnDefinitionToType,
+    mapColumnDefinitionToType: mapMySqlTypeToTsType,
     columnsInfoSql: `SELECT 
       table_name AS 'table', column_name AS 'column', data_type AS 'type', is_nullable AS 'nullable'
     FROM 
@@ -75,7 +75,7 @@ export const createPostgreSqlConnection = async (
       return res.rows as unknown as Record<string, unknown>[];
     },
     destroy: () => client.end(),
-    mapColumnDefinitionToType: mapPostgreSqlColumnDefinitionToType,
+    mapColumnDefinitionToType: mapPostgreSqlTypeToTsType,
     columnsInfoSql: `SELECT 
       table_name AS "table", column_name AS "column", udt_name AS "type", is_nullable AS "nullable"
     FROM 

@@ -5,10 +5,10 @@ import fs from 'fs';
 import path from 'path';
 
 import { generateSqlFnFromAst } from './generateSqlFnFromAst';
-import { generateReturnTypeFromAst } from './generateReturnTypeFromAst';
+import { generateReturnType } from './generateReturnType';
 import { astify } from './parser';
-import { generateParamsTypeFromAst } from './generateParamsTypeFromAst';
-import { getTablesDefinition } from './getTablesDefinition';
+import { generateQueryParamsType } from './generateQueryParamsType';
+import { getSchemaTypes } from './getSchemaTypes';
 import { getConnection } from './getConnection';
 
 export const codegen = async (nodeModulePath: string, rootPath: string) => {
@@ -39,7 +39,7 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
     ),
   ];
 
-  const tablesDefinition = await getTablesDefinition(connection, visitedTables);
+  const tablesDefinition = await getSchemaTypes(connection, visitedTables);
 
   for (const { file, basename, ast } of readFiles) {
     const generatedSqlFile = generateSqlFnFromAst(
@@ -48,13 +48,13 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
       basename,
       ast,
     );
-    const paramsType = generateParamsTypeFromAst(
+    const paramsType = generateQueryParamsType(
       connection.mapColumnDefinitionToType,
       tablesDefinition,
       basename,
       ast,
     );
-    const returnType = generateReturnTypeFromAst(
+    const returnType = generateReturnType(
       connection.mapColumnDefinitionToType,
       tablesDefinition,
       ojotasConfig.relations,

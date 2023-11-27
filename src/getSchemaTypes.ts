@@ -1,18 +1,28 @@
-import { ColumnDefinition } from './mapColumnDefinitionToType';
 import { Connection } from './orm';
 
-export interface TableDefinition {
-  [columnName: string]: ColumnDefinition;
-}
+type TableName = string;
+type ColumnName = string;
+type SqlType = string;
+
+export type SchemaTypes = Record<
+  TableName,
+  Record<
+    ColumnName,
+    {
+      type: SqlType;
+      nullable: boolean;
+    }
+  >
+>;
 
 const getEnumNameFromColumn = (dataType: string, columnName: string): string =>
   `${dataType}_${columnName}`;
 
-export const getTablesDefinition = async (
+export const getSchemaTypes = async (
   connection: Connection,
   tableNames: string[],
-): Promise<Record<string, TableDefinition>> => {
-  const tableDefinitions: Record<string, TableDefinition> = {};
+): Promise<SchemaTypes> => {
+  const schemaTypes: SchemaTypes = {};
 
   const columnsInfoSql = await connection.query(connection.columnsInfoSql, {
     tableNames: [tableNames],
@@ -24,17 +34,17 @@ export const getTablesDefinition = async (
     const dataType = row.type as string;
     const isNullable = row.nullable as string;
 
-    if (!tableDefinitions[tableName]) {
-      tableDefinitions[tableName] = {};
+    if (!schemaTypes[tableName]) {
+      schemaTypes[tableName] = {};
     }
 
-    tableDefinitions[tableName][columnName] = {
-      udtName: /^(enum|set)$/i.test(dataType)
+    schemaTypes[tableName][columnName] = {
+      type: /^(enum|set)$/i.test(dataType)
         ? getEnumNameFromColumn(dataType, columnName)
         : dataType,
       nullable: isNullable === 'YES',
     };
   });
 
-  return tableDefinitions;
+  return schemaTypes;
 };

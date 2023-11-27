@@ -1,14 +1,6 @@
 import { Column, ColumnRef, From } from 'node-sql-parser';
 import { AST } from './parser';
-import { TsType } from './mapSqlTypeToTsType';
-
-type ModelName = string;
-type AttributeName = string;
-
-export type ModelTypes = Record<
-  ModelName,
-  Record<AttributeName, { type: TsType; nullable: boolean }>
->;
+import { ModelName, ModelTypes, TsType } from './mapSqlTypeToTsType';
 
 export type ReturnColumns = Record<
   ModelName,
@@ -20,7 +12,7 @@ export type ReturnColumns = Record<
 >;
 
 export const getReturnColumns = (
-  types: ModelTypes,
+  modelTypes: ModelTypes,
   ast: AST,
 ): ReturnColumns => {
   //https://github.com/taozhi8833998/node-sql-parser/issues/1638
@@ -31,7 +23,7 @@ export const getReturnColumns = (
       const tableRef = columnRef.table;
       const tableName = from.find((f) => f.as === tableRef).table;
       const columnName = columnRef.column;
-      const type = Object.entries(types[tableName]).find(
+      const type = Object.entries(modelTypes[tableName]).find(
         ([cn]) => cn === columnName,
       )[1];
       acc[tableName] ??= [];
@@ -49,7 +41,7 @@ export const getReturnColumns = (
     return {
       [from]: ast.returning.columns.map((c) => {
         const columnName = c.expr.column;
-        const type = Object.entries(types[from]).find(
+        const type = Object.entries(modelTypes[from]).find(
           ([cn]) => cn === columnName,
         )[1];
         return {

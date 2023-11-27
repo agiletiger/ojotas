@@ -5,13 +5,44 @@ import fs from 'node:fs';
 import { generateSqlFnFromAst } from './generateSqlFnFromAst';
 import { astify } from './parser';
 import { Dialect } from './orm';
+import { ModelTypes } from './mapSqlTypeToTsType';
+import { Relations } from './assemble';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
 describe('generateSqlFnFromAst', () => {
   const rootPath = __dirname;
-  const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
+
+  const modelTypes: ModelTypes = {
+    users: {
+      id: { type: 'number', nullable: false },
+      name: { type: 'string', nullable: false },
+      email: { type: 'string', nullable: false },
+      age: { type: 'number', nullable: false },
+    },
+    posts: {
+      content: { type: 'string', nullable: true },
+      id: { type: 'number', nullable: false },
+      title: { type: 'string', nullable: true },
+      user_id: { type: 'number', nullable: true },
+    },
+  };
+
+  const relations: Relations = {
+    users: {
+      posts: ['hasMany', 'posts'],
+    },
+  };
+
+  const aliases = {
+    u: 'users',
+    p: 'posts',
+  };
+
+  // snapshots were created for mysql, we are testing the form or the file so that is why this is hardcoded
+  // not saying this is the best way but for now works
+  const ojotasConfig = { relations, aliases, dialect: 'mysql' as Dialect };
 
   it.each([
     { dialect: 'mysql' as Dialect },
@@ -22,6 +53,7 @@ describe('generateSqlFnFromAst', () => {
       const queryName = 'selectAllUsers';
       const sqlFn = generateSqlFnFromAst(
         rootPath,
+        modelTypes,
         ojotasConfig,
         queryName,
         astify(dialect, 'select id, name from users'),
@@ -46,6 +78,7 @@ describe('generateSqlFnFromAst', () => {
       const queryName = 'selectAllUsersWithPosts';
       const sqlFn = generateSqlFnFromAst(
         rootPath,
+        modelTypes,
         ojotasConfig,
         queryName,
         astify(
@@ -73,6 +106,7 @@ describe('generateSqlFnFromAst', () => {
       const queryName = 'selectUsersByName';
       const sqlFn = generateSqlFnFromAst(
         rootPath,
+        modelTypes,
         ojotasConfig,
         queryName,
         astify(dialect, 'select id, name from users where name like :name'),
@@ -97,6 +131,7 @@ describe('generateSqlFnFromAst', () => {
       const queryName = 'selectUsersWithCertainPosts';
       const sqlFn = generateSqlFnFromAst(
         rootPath,
+        modelTypes,
         ojotasConfig,
         queryName,
         astify(

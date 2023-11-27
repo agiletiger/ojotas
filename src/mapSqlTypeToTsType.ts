@@ -12,6 +12,15 @@ export type TsType =
   | 'Array<Date>'
   | 'any';
 
+// TODO: we should move these elsewhere
+export type ModelName = string;
+export type AttributeName = string;
+export type ModelTypes = Record<
+  ModelName,
+  Record<AttributeName, { type: TsType; nullable: boolean }>
+>;
+// end TODO
+
 export type MapSqlTypeToTsTypeFn = (sqlType: string) => TsType;
 
 export const mapMySqlTypeToTsType: MapSqlTypeToTsTypeFn = (sqlType) => {
