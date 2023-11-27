@@ -1,21 +1,21 @@
 import { describe, it } from '../test/test-utils';
 import assert from 'node:assert';
 
-import { SchemaTypes, getReturnColumns } from './getReturnColumns';
+import { ModelTypes, getReturnColumns } from './getReturnColumns';
 import { astify } from './parser';
 import { Dialect } from './orm';
 
 describe('getReturnColumns', () => {
-  const types: SchemaTypes = {
+  const types: ModelTypes = {
     users: {
-      id: { tsType: 'number', nullable: false },
-      name: { tsType: 'string', nullable: false },
+      id: { type: 'number', nullable: false },
+      name: { type: 'string', nullable: false },
     },
     posts: {
-      content: { tsType: 'string', nullable: true },
-      id: { tsType: 'number', nullable: false },
-      title: { tsType: 'string', nullable: true },
-      user_id: { tsType: 'number', nullable: true },
+      content: { type: 'string', nullable: true },
+      id: { type: 'number', nullable: false },
+      title: { type: 'string', nullable: true },
+      user_id: { type: 'number', nullable: true },
     },
   };
 
@@ -35,12 +35,12 @@ describe('getReturnColumns', () => {
       {
         users: [
           {
-            column: 'id',
+            name: 'id',
             nullable: false,
             type: 'number',
           },
           {
-            column: 'name',
+            name: 'name',
             nullable: false,
             type: 'string',
           },
@@ -66,10 +66,10 @@ describe('getReturnColumns', () => {
         ),
       ),
       {
-        users: [{ column: 'name', nullable: false, type: 'string' }],
+        users: [{ name: 'name', nullable: false, type: 'string' }],
         posts: [
-          { column: 'title', nullable: true, type: 'string' },
-          { column: 'content', nullable: true, type: 'string' },
+          { name: 'title', nullable: true, type: 'string' },
+          { name: 'content', nullable: true, type: 'string' },
         ],
       },
     );
@@ -85,7 +85,7 @@ describe('getReturnColumns', () => {
         ),
       ),
       {
-        users: [{ column: 'id', nullable: false, type: 'number' }],
+        users: [{ name: 'id', nullable: false, type: 'number' }],
       },
     );
   });
@@ -100,7 +100,7 @@ describe('getReturnColumns', () => {
         ),
       ),
       {
-        users: [{ column: 'id', nullable: false, type: 'number' }],
+        users: [{ name: 'id', nullable: false, type: 'number' }],
       },
     );
   });

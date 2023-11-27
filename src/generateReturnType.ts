@@ -13,7 +13,7 @@ export const generateReturnType = (
     const types = columns
       .map(
         (column) =>
-          `${column.column}${column.nullable ? '?' : ''}: ${column.type};`,
+          `${column.name}${column.nullable ? '?' : ''}: ${column.type};`,
       )
       .join('\n');
 

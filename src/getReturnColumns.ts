@@ -2,25 +2,25 @@ import { Column, ColumnRef, From } from 'node-sql-parser';
 import { AST } from './parser';
 import { TsType } from './mapSqlTypeToTsType';
 
-type TableName = string;
-type ColumnName = string;
+type ModelName = string;
+type AttributeName = string;
 
-export type SchemaTypes = Record<
-  TableName,
-  Record<ColumnName, { tsType: TsType; nullable: boolean }>
+export type ModelTypes = Record<
+  ModelName,
+  Record<AttributeName, { type: TsType; nullable: boolean }>
 >;
 
 export type ReturnColumns = Record<
-  TableName,
+  ModelName,
   Array<{
-    column: string;
+    name: string;
     type: TsType;
     nullable: boolean;
   }>
 >;
 
 export const getReturnColumns = (
-  types: SchemaTypes,
+  types: ModelTypes,
   ast: AST,
 ): ReturnColumns => {
   //https://github.com/taozhi8833998/node-sql-parser/issues/1638
@@ -36,8 +36,8 @@ export const getReturnColumns = (
       )[1];
       acc[tableName] ??= [];
       acc[tableName].push({
-        column: columnName,
-        type: type.tsType,
+        name: columnName,
+        type: type.type,
         nullable: type.nullable,
       });
       return acc;
@@ -53,8 +53,8 @@ export const getReturnColumns = (
           ([cn]) => cn === columnName,
         )[1];
         return {
-          column: columnName,
-          type: type.tsType,
+          name: columnName,
+          type: type.type,
           nullable: type.nullable,
         };
       }),

@@ -18,8 +18,8 @@ describe('generateReturnType', () => {
     const queryName = 'selectAllUsers';
     const typeDefinition = generateReturnType(relations, queryName, {
       users: [
-        { column: 'id', type: 'number', nullable: false },
-        { column: 'name', type: 'string', nullable: false },
+        { name: 'id', type: 'number', nullable: false },
+        { name: 'name', type: 'string', nullable: false },
       ],
     });
 
@@ -37,10 +37,10 @@ describe('generateReturnType', () => {
   it('should create the type when querying a one to many relation', () => {
     const queryName = 'selectAllUsersWithPosts';
     const typeDefinition = generateReturnType(relations, queryName, {
-      users: [{ column: 'name', type: 'string', nullable: false }],
+      users: [{ name: 'name', type: 'string', nullable: false }],
       posts: [
-        { column: 'title', type: 'string', nullable: true },
-        { column: 'content', type: 'string', nullable: true },
+        { name: 'title', type: 'string', nullable: true },
+        { name: 'content', type: 'string', nullable: true },
       ],
     });
 
@@ -61,10 +61,10 @@ describe('generateReturnType', () => {
   it.skip('should create the type when querying a one to many relation (inner join)', () => {
     const queryName = 'selectAllUsersWithPosts';
     const typeDefinition = generateReturnType(relations, queryName, {
-      users: [{ column: 'name', type: 'string', nullable: false }],
+      users: [{ name: 'name', type: 'string', nullable: false }],
       posts: [
-        { column: 'title', type: 'string', nullable: true },
-        { column: 'content', type: 'string', nullable: true },
+        { name: 'title', type: 'string', nullable: true },
+        { name: 'content', type: 'string', nullable: true },
       ],
     });
 
@@ -85,10 +85,10 @@ describe('generateReturnType', () => {
   it.skip('should create the type when querying a one to many relation (left join)', () => {
     const queryName = 'selectAllUsersAndPosts';
     const typeDefinition = generateReturnType(relations, queryName, {
-      users: [{ column: 'name', type: 'string', nullable: false }],
+      users: [{ name: 'name', type: 'string', nullable: false }],
       posts: [
-        { column: 'title', type: 'string', nullable: true },
-        { column: 'content', type: 'string', nullable: true },
+        { name: 'title', type: 'string', nullable: true },
+        { name: 'content', type: 'string', nullable: true },
       ],
     });
 
