@@ -1,21 +1,5 @@
-import { ColumnRef, From } from 'node-sql-parser';
+import { ColumnRef, Expr, From, Param } from 'node-sql-parser';
 import { AST } from './parser';
-
-// types are not provided https://github.com/taozhi8833998/node-sql-parser/issues/1662
-type Param = { type: 'param'; value: string };
-type Expr =
-  | {
-      type: 'binary_expr';
-      operator: 'AND' | 'OR';
-      left: Expr;
-      right: Expr;
-    }
-  | {
-      type: 'binary_expr';
-      operator: string;
-      left: ColumnRef | Param;
-      right: ColumnRef | Param;
-    };
 
 const getParamBranch = (expr: Expr) =>
   expr.left.type === 'param'
