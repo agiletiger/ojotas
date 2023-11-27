@@ -1,14 +1,11 @@
 import { describe, it } from '../test/test-utils';
 import assert from 'node:assert';
 
-import {
-  SchemaTypes,
-  getSelectedColumnsFromAst,
-} from './getSelectedColumnsFromAst';
+import { SchemaTypes, getReturnColumns } from './getReturnColumns';
 import { astify } from './parser';
 import { Dialect } from './orm';
 
-describe('getSelectedColumnsFromAst', () => {
+describe('getReturnColumns', () => {
   const types: SchemaTypes = {
     users: {
       id: { tsType: 'number', nullable: false },
@@ -31,7 +28,7 @@ describe('getSelectedColumnsFromAst', () => {
     },
   ])('$dialect - should work for a single table', ({ dialect }) => {
     assert.deepEqual(
-      getSelectedColumnsFromAst(
+      getReturnColumns(
         types,
         astify(dialect, 'select u.id, u.name from users u'),
       ),
@@ -61,7 +58,7 @@ describe('getSelectedColumnsFromAst', () => {
     },
   ])('$dialect - should work for two tables', ({ dialect }) => {
     assert.deepEqual(
-      getSelectedColumnsFromAst(
+      getReturnColumns(
         types,
         astify(
           dialect,
@@ -80,7 +77,7 @@ describe('getSelectedColumnsFromAst', () => {
 
   it('postgres - should support returning in update statements', () => {
     assert.deepEqual(
-      getSelectedColumnsFromAst(
+      getReturnColumns(
         types,
         astify(
           'postgres',
@@ -95,7 +92,7 @@ describe('getSelectedColumnsFromAst', () => {
 
   it('postgres - should support returning in insert statements', () => {
     assert.deepEqual(
-      getSelectedColumnsFromAst(
+      getReturnColumns(
         types,
         astify(
           'postgres',

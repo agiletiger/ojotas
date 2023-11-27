@@ -1,6 +1,6 @@
 import { Column, ColumnRef, From } from 'node-sql-parser';
 import { AST } from './parser';
-import { MapSqlTypeToTsTypeFn, TsType } from './mapSqlTypeToTsType';
+import { TsType } from './mapSqlTypeToTsType';
 
 type TableName = string;
 type ColumnName = string;
@@ -10,17 +10,19 @@ export type SchemaTypes = Record<
   Record<ColumnName, { tsType: TsType; nullable: boolean }>
 >;
 
-export const getSelectedColumnsFromAst = (
-  types: SchemaTypes,
-  ast: AST,
-): Record<
+export type ReturnColumns = Record<
   TableName,
   Array<{
     column: string;
-    type: ReturnType<MapSqlTypeToTsTypeFn>;
+    type: TsType;
     nullable: boolean;
   }>
-> => {
+>;
+
+export const getReturnColumns = (
+  types: SchemaTypes,
+  ast: AST,
+): ReturnColumns => {
   //https://github.com/taozhi8833998/node-sql-parser/issues/1638
   if (ast.type === 'select' && ast.columns !== '*') {
     const from = ast.from as Array<From>;
