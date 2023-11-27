@@ -2,7 +2,7 @@ import { describe, it } from '../test/test-utils';
 import assert from 'node:assert';
 import fs from 'node:fs';
 
-import { generateSqlFnFromAst } from './generateSqlFnFromAst';
+import { generateSqlDescriptor } from './generateSqlDescriptor';
 import { astify } from './parser';
 import { Dialect } from './orm';
 import { ModelTypes } from './mapSqlTypeToTsType';
@@ -11,7 +11,7 @@ import { Relations } from './assemble';
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
-describe('generateSqlFnFromAst', () => {
+describe('generateSqlDescriptor', () => {
   const rootPath = __dirname;
 
   const modelTypes: ModelTypes = {
@@ -51,7 +51,7 @@ describe('generateSqlFnFromAst', () => {
     '$dialect - should create the sql function when querying from a single table',
     ({ dialect }) => {
       const queryName = 'selectAllUsers';
-      const sqlFn = generateSqlFnFromAst(
+      const sqlFn = generateSqlDescriptor(
         rootPath,
         modelTypes,
         ojotasConfig,
@@ -76,7 +76,7 @@ describe('generateSqlFnFromAst', () => {
     '$dialect - should create the sql function when querying a one to many relation',
     ({ dialect }) => {
       const queryName = 'selectAllUsersWithPosts';
-      const sqlFn = generateSqlFnFromAst(
+      const sqlFn = generateSqlDescriptor(
         rootPath,
         modelTypes,
         ojotasConfig,
@@ -104,7 +104,7 @@ describe('generateSqlFnFromAst', () => {
     '$dialect - should create the sql function when querying from a single table with params',
     ({ dialect }) => {
       const queryName = 'selectUsersByName';
-      const sqlFn = generateSqlFnFromAst(
+      const sqlFn = generateSqlDescriptor(
         rootPath,
         modelTypes,
         ojotasConfig,
@@ -129,7 +129,7 @@ describe('generateSqlFnFromAst', () => {
     '$dialect - should create the sql function when querying a one to many relation with params',
     ({ dialect }) => {
       const queryName = 'selectUsersWithCertainPosts';
-      const sqlFn = generateSqlFnFromAst(
+      const sqlFn = generateSqlDescriptor(
         rootPath,
         modelTypes,
         ojotasConfig,

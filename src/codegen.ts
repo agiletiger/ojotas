@@ -4,7 +4,7 @@ import { globSync } from 'fast-glob';
 import fs from 'fs';
 import path from 'path';
 
-import { generateSqlFnFromAst } from './generateSqlFnFromAst';
+import { generateSqlDescriptor } from './generateSqlDescriptor';
 import { generateReturnType } from './generateReturnType';
 import { astify } from './parser';
 import { generateQueryParamsType } from './generateQueryParamsType';
@@ -42,7 +42,7 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const tablesDefinition = await getSchemaTypes(connection, visitedTables);
 
   for (const { file, basename, ast } of readFiles) {
-    const generatedSqlFile = generateSqlFnFromAst(
+    const generatedSqlFile = generateSqlDescriptor(
       nodeModulePath,
       ojotasConfig,
       basename,

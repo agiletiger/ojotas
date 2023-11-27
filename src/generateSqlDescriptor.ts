@@ -10,7 +10,7 @@ import { getIdentifiers } from './getIdentifiers';
 import { Dialect } from './orm';
 import { ModelTypes } from './mapSqlTypeToTsType';
 
-export const generateSqlFnFromAst = (
+export const generateSqlDescriptor = (
   rootPath: string, // I'm passing this so same function can work with local tests and inside node_modules. Not sure this is the right way..
   modelTypes: ModelTypes,
   ojotasConfig: {
