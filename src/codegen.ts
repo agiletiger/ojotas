@@ -10,6 +10,8 @@ import { astify } from './parser';
 import { generateQueryParamsType } from './generateQueryParamsType';
 import { getSchemaTypes } from './getSchemaTypes';
 import { getConnection } from './getConnection';
+import { getQueryParams } from './getQueryParams';
+import { getReturnColumns } from './getReturnColumns';
 
 export const codegen = async (nodeModulePath: string, rootPath: string) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
@@ -39,27 +41,43 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
     ),
   ];
 
-  const tablesDefinition = await getSchemaTypes(connection, visitedTables);
+  const schemaTypes = await getSchemaTypes(connection, visitedTables);
+
+  // this happens when you don't have lenses
+  const modelTypes = Object.fromEntries(
+    Object.entries(schemaTypes).map(([tableName, columns]) => {
+      return [
+        tableName,
+        Object.fromEntries(
+          Object.entries(columns).map(([columnName, { type, nullable }]) => [
+            columnName,
+            {
+              type: connection.mapMySqlTypeToTsType(type),
+              nullable,
+            },
+          ]),
+        ),
+      ];
+    }),
+  );
 
   for (const { file, basename, ast } of readFiles) {
     const generatedSqlFile = generateSqlDescriptor(
       nodeModulePath,
+      modelTypes,
       ojotasConfig,
       basename,
       ast,
     );
+
     const paramsType = generateQueryParamsType(
-      connection.mapColumnDefinitionToType,
-      tablesDefinition,
       basename,
-      ast,
+      getQueryParams(modelTypes, ast),
     );
     const returnType = generateReturnType(
-      connection.mapColumnDefinitionToType,
-      tablesDefinition,
       ojotasConfig.relations,
       basename,
-      ast,
+      getReturnColumns(modelTypes, ast),
     );
     const outputPath = path.join(path.dirname(file), basename + '.sql.ts');
     fs.writeFileSync(
