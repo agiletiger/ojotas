@@ -6,7 +6,9 @@
     "lint": "eslint ./src",
     "with-ts": "node -r ts-node/register",
     "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
-    "test-unit": "npm run with-ts -- --env-file=.env --test $(find ./src -name '*.test.ts' -and -not -name 'orm.test.ts')",
+    "test-unit-mysql": "DIALECT=mysql npm run with-ts -- --env-file=.env --test $(find ./src -name '*.test.ts' -and -not -name 'orm.test.ts')",
+    "test-unit-postgres": "DIALECT=postgres npm run with-ts -- --env-file=.env --test $(find ./src -name '*.test.ts' -and -not -name 'orm.test.ts')",
+    "test-unit": "npm run test-unit-mysql && npm run test-unit-postgres",
     "test-mysql": "DIALECT=mysql npm run with-ts -- --env-file=.env --test ./src/orm.test.ts",
     "test-postgres": "DIALECT=postgres npm run with-ts -- --env-file=.env --test ./src/orm.test.ts",
     "test": "npm run test-unit && npm run test-mysql && npm run test-postgres"

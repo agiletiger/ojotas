@@ -1,4 +1,4 @@
-import { describe, it } from '../test/test-utils';
+import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import fs from 'node:fs';
 
@@ -40,113 +40,91 @@ describe('generateSqlDescriptor', () => {
     p: 'posts',
   };
 
+  const dialect = process.env.DIALECT as Dialect;
+
   // snapshots were created for mysql, we are testing the form or the file so that is why this is hardcoded
   // not saying this is the best way but for now works
   const ojotasConfig = { relations, aliases, dialect: 'mysql' as Dialect };
 
-  it.each([
-    { dialect: 'mysql' as Dialect },
-    { dialect: 'postgres' as Dialect },
-  ])(
-    '$dialect - should create the sql function when querying from a single table',
-    ({ dialect }) => {
-      const queryName = 'selectAllUsers';
-      const sqlFn = generateSqlDescriptor(
-        rootPath,
-        modelTypes,
-        ojotasConfig,
-        queryName,
-        astify(dialect, 'select id, name from users'),
-      );
+  it('should create the sql function when querying from a single table', () => {
+    const queryName = 'selectAllUsers';
+    const sqlFn = generateSqlDescriptor(
+      rootPath,
+      modelTypes,
+      ojotasConfig,
+      queryName,
+      astify(dialect, 'select id, name from users'),
+    );
 
-      assertEqualIgnoreWhiteSpaces(
-        sqlFn,
-        fs
-          .readFileSync('./snapshots/selectAllUsers.sql.ts')
-          .toString()
-          .replace('// @ts-nocheck', ''),
-      );
-    },
-  );
+    assertEqualIgnoreWhiteSpaces(
+      sqlFn,
+      fs
+        .readFileSync('./snapshots/selectAllUsers.sql.ts')
+        .toString()
+        .replace('// @ts-nocheck', ''),
+    );
+  });
 
-  it.each([
-    { dialect: 'mysql' as Dialect },
-    { dialect: 'postgres' as Dialect },
-  ])(
-    '$dialect - should create the sql function when querying a one to many relation',
-    ({ dialect }) => {
-      const queryName = 'selectAllUsersWithPosts';
-      const sqlFn = generateSqlDescriptor(
-        rootPath,
-        modelTypes,
-        ojotasConfig,
-        queryName,
-        astify(
-          dialect,
-          'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id',
-        ),
-      );
+  it('should create the sql function when querying a one to many relation', () => {
+    const queryName = 'selectAllUsersWithPosts';
+    const sqlFn = generateSqlDescriptor(
+      rootPath,
+      modelTypes,
+      ojotasConfig,
+      queryName,
+      astify(
+        dialect,
+        'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id',
+      ),
+    );
 
-      assertEqualIgnoreWhiteSpaces(
-        sqlFn,
-        fs
-          .readFileSync('./snapshots/selectAllUsersWithPosts.sql.ts')
-          .toString()
-          .replace('// @ts-nocheck', ''),
-      );
-    },
-  );
+    assertEqualIgnoreWhiteSpaces(
+      sqlFn,
+      fs
+        .readFileSync('./snapshots/selectAllUsersWithPosts.sql.ts')
+        .toString()
+        .replace('// @ts-nocheck', ''),
+    );
+  });
 
-  it.each([
-    { dialect: 'mysql' as Dialect },
-    { dialect: 'postgres' as Dialect },
-  ])(
-    '$dialect - should create the sql function when querying from a single table with params',
-    ({ dialect }) => {
-      const queryName = 'selectUsersByName';
-      const sqlFn = generateSqlDescriptor(
-        rootPath,
-        modelTypes,
-        ojotasConfig,
-        queryName,
-        astify(dialect, 'select id, name from users where name like :name'),
-      );
+  it('should create the sql function when querying from a single table with params', () => {
+    const queryName = 'selectUsersByName';
+    const sqlFn = generateSqlDescriptor(
+      rootPath,
+      modelTypes,
+      ojotasConfig,
+      queryName,
+      astify(dialect, 'select id, name from users where name like :name'),
+    );
 
-      assertEqualIgnoreWhiteSpaces(
-        sqlFn,
-        fs
-          .readFileSync('./snapshots/selectUsersByName.sql.ts')
-          .toString()
-          .replace('// @ts-nocheck', ''),
-      );
-    },
-  );
+    assertEqualIgnoreWhiteSpaces(
+      sqlFn,
+      fs
+        .readFileSync('./snapshots/selectUsersByName.sql.ts')
+        .toString()
+        .replace('// @ts-nocheck', ''),
+    );
+  });
 
-  it.each([
-    { dialect: 'mysql' as Dialect },
-    { dialect: 'postgres' as Dialect },
-  ])(
-    '$dialect - should create the sql function when querying a one to many relation with params',
-    ({ dialect }) => {
-      const queryName = 'selectUsersWithCertainPosts';
-      const sqlFn = generateSqlDescriptor(
-        rootPath,
-        modelTypes,
-        ojotasConfig,
-        queryName,
-        astify(
-          dialect,
-          'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id where p.title like :title',
-        ),
-      );
+  it('should create the sql function when querying a one to many relation with params', () => {
+    const queryName = 'selectUsersWithCertainPosts';
+    const sqlFn = generateSqlDescriptor(
+      rootPath,
+      modelTypes,
+      ojotasConfig,
+      queryName,
+      astify(
+        dialect,
+        'select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id where p.title like :title',
+      ),
+    );
 
-      assertEqualIgnoreWhiteSpaces(
-        sqlFn,
-        fs
-          .readFileSync('./snapshots/selectUsersWithCertainPosts.sql.ts')
-          .toString()
-          .replace('// @ts-nocheck', ''),
-      );
-    },
-  );
+    assertEqualIgnoreWhiteSpaces(
+      sqlFn,
+      fs
+        .readFileSync('./snapshots/selectUsersWithCertainPosts.sql.ts')
+        .toString()
+        .replace('// @ts-nocheck', ''),
+    );
+  });
 });
