@@ -35,8 +35,8 @@ describe('orm', async () => {
     }
   });
 
-  after(() => {
-    connection.destroy();
+  after(async () => {
+    await connection.destroy();
   });
 
   it('should work for query without relations using select *', async () => {

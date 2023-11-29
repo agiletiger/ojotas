@@ -24,10 +24,10 @@ export const generateSqlTsFile = (
   ast: AST,
 ) => {
   const queryWithoutParams = fs
-    .readFileSync(path.join(rootPath, '../templates/query-without-params.ts'))
+    .readFileSync(path.join(rootPath, './templates/query-without-params.ts'))
     .toString();
   const queryWithParams = fs
-    .readFileSync(path.join(rootPath, '../templates/query-with-params.ts'))
+    .readFileSync(path.join(rootPath, './templates/query-with-params.ts'))
     .toString();
 
   const queryParams = getQueryParams(modelTypes, ast);

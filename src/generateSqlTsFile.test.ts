@@ -7,12 +7,13 @@ import { astify } from './parser';
 import { Dialect } from './orm';
 import { ModelTypes } from './mapSqlTypeToTsType';
 import { Relations } from './assemble';
+import path from 'node:path';
 
 const assertEqualIgnoreWhiteSpaces = (actual: string, expected: string) =>
   assert.equal(actual.replace(/\s+/g, ' '), expected.replace(/\s+/g, ' '));
 
 describe('generateSqlDescriptor', () => {
-  const rootPath = __dirname;
+  const rootPath = path.join(__dirname, '..');
 
   const modelTypes: ModelTypes = {
     users: {

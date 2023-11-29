@@ -9,10 +9,13 @@ import { astify } from './parser';
 import { getSchemaTypes } from './getSchemaTypes';
 import { getConnection } from './getConnection';
 
-export const codegen = async (nodeModulePath: string, rootPath: string) => {
+export const codegen = async (
+  nodeModulePath: string,
+  sqlFilesRootPath: string,
+) => {
   const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
 
-  const files = globSync(path.join(rootPath, '/**/*.sql'));
+  const files = globSync(path.join(sqlFilesRootPath, '/**/*.sql'));
 
   const connection = await getConnection(ojotasConfig.dialect);
 
@@ -70,5 +73,5 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
     fs.writeFileSync(outputPath, generatedSqlFile);
   }
 
-  connection.destroy();
+  await connection.destroy();
 };
