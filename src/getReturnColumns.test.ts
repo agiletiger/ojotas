@@ -1,4 +1,4 @@
-import { describe, it } from '../test/test-utils';
+import { describe, it } from 'node:test';
 import assert from 'node:assert';
 
 import { getReturnColumns } from './getReturnColumns';
@@ -20,14 +20,9 @@ describe('getReturnColumns', () => {
     },
   };
 
-  it.each([
-    {
-      dialect: 'mysql' as Dialect,
-    },
-    {
-      dialect: 'postgres' as Dialect,
-    },
-  ])('$dialect - should work for a single table', ({ dialect }) => {
+  const dialect = process.env.DIALECT as Dialect;
+
+  it('should work for a single table', () => {
     assert.deepEqual(
       getReturnColumns(
         modelTypes,
@@ -50,14 +45,7 @@ describe('getReturnColumns', () => {
     );
   });
 
-  it.each([
-    {
-      dialect: 'mysql' as Dialect,
-    },
-    {
-      dialect: 'postgres' as Dialect,
-    },
-  ])('$dialect - should work for two tables', ({ dialect }) => {
+  it('should work for two tables', () => {
     assert.deepEqual(
       getReturnColumns(
         modelTypes,
@@ -76,33 +64,41 @@ describe('getReturnColumns', () => {
     );
   });
 
-  it('postgres - should support returning in update statements', () => {
-    assert.deepEqual(
-      getReturnColumns(
-        modelTypes,
-        astify(
-          'postgres',
-          'update users set name = "nico" where id = 1 returning id',
+  it(
+    'postgres - should support returning in update statements',
+    { skip: dialect !== 'postgres' },
+    () => {
+      assert.deepEqual(
+        getReturnColumns(
+          modelTypes,
+          astify(
+            'postgres',
+            'update users set name = "nico" where id = 1 returning id',
+          ),
         ),
-      ),
-      {
-        users: [{ name: 'id', nullable: false, type: 'number' }],
-      },
-    );
-  });
+        {
+          users: [{ name: 'id', nullable: false, type: 'number' }],
+        },
+      );
+    },
+  );
 
-  it('postgres - should support returning in insert statements', () => {
-    assert.deepEqual(
-      getReturnColumns(
-        modelTypes,
-        astify(
-          'postgres',
-          'insert into users (name) values ("eze") returning id',
+  it(
+    'postgres - should support returning in insert statements',
+    { skip: dialect !== 'postgres' },
+    () => {
+      assert.deepEqual(
+        getReturnColumns(
+          modelTypes,
+          astify(
+            'postgres',
+            'insert into users (name) values ("eze") returning id',
+          ),
         ),
-      ),
-      {
-        users: [{ name: 'id', nullable: false, type: 'number' }],
-      },
-    );
-  });
+        {
+          users: [{ name: 'id', nullable: false, type: 'number' }],
+        },
+      );
+    },
+  );
 });

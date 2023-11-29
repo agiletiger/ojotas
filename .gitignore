@@ -8,3 +8,6 @@ lib
 .nvmrc
 
 .idea
+
+# generated files of codegen test
+test/config/queries/*.sql.ts

@@ -4,19 +4,23 @@ import { globSync } from 'fast-glob';
 import fs from 'fs';
 import path from 'path';
 
-import { generateSqlDescriptor } from './generateSqlDescriptor';
-import { generateReturnType } from './generateReturnType';
+import { generateSqlTsFile } from './generateSqlTsFile';
 import { astify } from './parser';
-import { generateQueryParamsType } from './generateQueryParamsType';
 import { getSchemaTypes } from './getSchemaTypes';
 import { getConnection } from './getConnection';
-import { getQueryParams } from './getQueryParams';
-import { getReturnColumns } from './getReturnColumns';
+import { Relations } from './assemble';
+import { Dialect } from './orm';
 
-export const codegen = async (nodeModulePath: string, rootPath: string) => {
-  const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
-
-  const files = globSync(path.join(rootPath, '/**/*.sql'));
+export const codegen = async (
+  nodeModulePath: string,
+  ojotasConfig: {
+    aliases: Record<string, string>;
+    relations: Relations;
+    dialect: Dialect;
+  },
+  sqlFilesRootPath: string,
+) => {
+  const files = globSync(path.join(sqlFilesRootPath, '/**/*.sql'));
 
   const connection = await getConnection(ojotasConfig.dialect);
 
@@ -62,7 +66,7 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
   );
 
   for (const { file, basename, ast } of readFiles) {
-    const generatedSqlFile = generateSqlDescriptor(
+    const generatedSqlFile = generateSqlTsFile(
       nodeModulePath,
       modelTypes,
       ojotasConfig,
@@ -70,23 +74,9 @@ export const codegen = async (nodeModulePath: string, rootPath: string) => {
       ast,
     );
 
-    const paramsType = generateQueryParamsType(
-      basename,
-      getQueryParams(modelTypes, ast),
-    );
-    const returnType = generateReturnType(
-      ojotasConfig.relations,
-      basename,
-      getReturnColumns(modelTypes, ast),
-    );
     const outputPath = path.join(path.dirname(file), basename + '.sql.ts');
-    fs.writeFileSync(
-      outputPath,
-      generatedSqlFile
-        .replace('$paramsTypePlaceholder$', paramsType)
-        .replace('$returnTypePlaceholder$', returnType),
-    );
+    fs.writeFileSync(outputPath, generatedSqlFile);
   }
 
-  connection.destroy();
+  await connection.destroy();
 };

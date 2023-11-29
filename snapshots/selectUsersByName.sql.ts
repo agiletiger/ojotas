@@ -1,7 +1,7 @@
-// @ts-nocheck
-$paramsTypePlaceholder$
 
-$returnTypePlaceholder$
+export type SelectUsersByNameQueryParams = { name: string; }; 
+
+export interface ISelectUsersByNameQueryResultItem { id: number; name: string; }
 
 export const selectUsersByName = (params: SelectUsersByNameQueryParams) => {
   return () => {

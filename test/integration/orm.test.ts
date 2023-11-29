@@ -1,8 +1,8 @@
 import { after, describe, before, it } from 'node:test';
 import assert from 'node:assert';
-import { query, Descriptor, Connection } from './orm';
-import { getConnection } from './getConnection';
-import { getTestConfigStatements } from '../test/helpers/getTestConfigStatements';
+import { query, Descriptor, Connection } from '../../src/orm';
+import { getConnection } from '../../src/getConnection';
+import { getTestConfigStatements } from '../helpers/getTestConfigStatements';
 
 interface ISelectUsersQueryResultItem {
   id: string;
@@ -35,8 +35,8 @@ describe('orm', async () => {
     }
   });
 
-  after(() => {
-    connection.destroy();
+  after(async () => {
+    await connection.destroy();
   });
 
   it('should work for query without relations using select *', async () => {

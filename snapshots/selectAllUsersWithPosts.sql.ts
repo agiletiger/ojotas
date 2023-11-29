@@ -1,5 +1,5 @@
-// @ts-nocheck
-$returnTypePlaceholder$
+
+export interface ISelectAllUsersWithPostsQueryResultItem { name: string; posts: Array<{ title?: string; content?: string; }>; }
 
 export const selectAllUsersWithPosts = () => {
   return {
