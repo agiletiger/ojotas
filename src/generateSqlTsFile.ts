@@ -9,8 +9,10 @@ import { getParamsTypeName } from './getParamsTypeName';
 import { getIdentifiers } from './getIdentifiers';
 import { Dialect } from './orm';
 import { ModelTypes } from './mapSqlTypeToTsType';
+import { generateQueryParamsType } from './generateQueryParamsType';
+import { generateReturnType } from './generateReturnType';
 
-export const generateSqlDescriptor = (
+export const generateSqlTsFile = (
   rootPath: string, // I'm passing this so same function can work with local tests and inside node_modules. Not sure this is the right way..
   modelTypes: ModelTypes,
   ojotasConfig: {
@@ -28,25 +30,29 @@ export const generateSqlDescriptor = (
     .readFileSync(path.join(rootPath, '../templates/query-with-params.ts'))
     .toString();
 
-  const returnColumns = getReturnColumns(modelTypes, ast);
-  // TODO: refactor. getParamsFromAst is also called in codegen
   const queryParams = getQueryParams(modelTypes, ast);
+  const returnColumns = getReturnColumns(modelTypes, ast);
+  const paramsType = generateQueryParamsType(queryName, queryParams);
+  const returnType = generateReturnType(
+    ojotasConfig.relations,
+    queryName,
+    returnColumns,
+  );
   const identifiers = getIdentifiers(ojotasConfig.aliases, returnColumns);
 
-  if (queryParams.length) {
-    return queryWithParams
-      .replace('$queryName$', queryName)
-      .replace('$sql$', aliasify(ojotasConfig.dialect, ast))
-      .replace('$identifiers$', JSON.stringify(identifiers))
-      .replace('$paramsTypeName$', getParamsTypeName(queryName))
-      .replace('$returnTypeName$', getReturnTypeName(queryName))
-      .replace('// @ts-nocheck', '');
-  } else {
-    return queryWithoutParams
-      .replace('$queryName$', queryName)
-      .replace('$sql$', aliasify(ojotasConfig.dialect, ast))
-      .replace('$identifiers$', JSON.stringify(identifiers))
-      .replace('$returnTypeName$', getReturnTypeName(queryName))
-      .replace('// @ts-nocheck', '');
-  }
+  return (
+    queryParams.length
+      ? queryWithParams.replace(
+          '$paramsTypeName$',
+          getParamsTypeName(queryName),
+        )
+      : queryWithoutParams
+  )
+    .replace('$queryName$', queryName)
+    .replace('$sql$', aliasify(ojotasConfig.dialect, ast))
+    .replace('$identifiers$', JSON.stringify(identifiers))
+    .replace('$returnTypeName$', getReturnTypeName(queryName))
+    .replace('$paramsTypePlaceholder$', paramsType)
+    .replace('$returnTypePlaceholder$', returnType)
+    .replace('// @ts-nocheck', '');
 };

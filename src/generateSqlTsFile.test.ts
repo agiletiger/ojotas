@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import fs from 'node:fs';
 
-import { generateSqlDescriptor } from './generateSqlDescriptor';
+import { generateSqlTsFile } from './generateSqlTsFile';
 import { astify } from './parser';
 import { Dialect } from './orm';
 import { ModelTypes } from './mapSqlTypeToTsType';
@@ -48,7 +48,7 @@ describe('generateSqlDescriptor', () => {
 
   it('should create the sql function when querying from a single table', () => {
     const queryName = 'selectAllUsers';
-    const sqlFn = generateSqlDescriptor(
+    const sqlFn = generateSqlTsFile(
       rootPath,
       modelTypes,
       ojotasConfig,
@@ -67,7 +67,7 @@ describe('generateSqlDescriptor', () => {
 
   it('should create the sql function when querying a one to many relation', () => {
     const queryName = 'selectAllUsersWithPosts';
-    const sqlFn = generateSqlDescriptor(
+    const sqlFn = generateSqlTsFile(
       rootPath,
       modelTypes,
       ojotasConfig,
@@ -89,7 +89,7 @@ describe('generateSqlDescriptor', () => {
 
   it('should create the sql function when querying from a single table with params', () => {
     const queryName = 'selectUsersByName';
-    const sqlFn = generateSqlDescriptor(
+    const sqlFn = generateSqlTsFile(
       rootPath,
       modelTypes,
       ojotasConfig,
@@ -108,7 +108,7 @@ describe('generateSqlDescriptor', () => {
 
   it('should create the sql function when querying a one to many relation with params', () => {
     const queryName = 'selectUsersWithCertainPosts';
-    const sqlFn = generateSqlDescriptor(
+    const sqlFn = generateSqlTsFile(
       rootPath,
       modelTypes,
       ojotasConfig,
