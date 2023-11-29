@@ -8,13 +8,18 @@ import { generateSqlTsFile } from './generateSqlTsFile';
 import { astify } from './parser';
 import { getSchemaTypes } from './getSchemaTypes';
 import { getConnection } from './getConnection';
+import { Relations } from './assemble';
+import { Dialect } from './orm';
 
 export const codegen = async (
   nodeModulePath: string,
+  ojotasConfig: {
+    aliases: Record<string, string>;
+    relations: Relations;
+    dialect: Dialect;
+  },
   sqlFilesRootPath: string,
 ) => {
-  const ojotasConfig = JSON.parse(fs.readFileSync('.ojotasrc.json').toString());
-
   const files = globSync(path.join(sqlFilesRootPath, '/**/*.sql'));
 
   const connection = await getConnection(ojotasConfig.dialect);
