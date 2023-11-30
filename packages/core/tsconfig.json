@@ -7,7 +7,7 @@
     "moduleResolution": "NodeNext",
     "declaration": true,
     "esModuleInterop": true,
-    "typeRoots": ["./node_modules/@types", "./typings"]
+    "typeRoots": ["../../node_modules/@types", "./typings"]
   },
   "include": ["./src/**/*"],
   "exclude": ["./src/**/*.test.ts", "./src/templates/*"]
