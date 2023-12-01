@@ -1,0 +1,12 @@
+{
+  "aliases": {
+    "u": "users",
+    "p": "posts"
+  },
+  "relations": {
+    "users": {
+      "posts": ["hasMany", "posts"] 
+    }
+  },
+  "dialect": "mysql"
+}

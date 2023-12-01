@@ -36,7 +36,5 @@
   "peerDependencies": {
     "mysql2": "^3.6.0",
     "pg": "^8.11.3"
-  },
-  "devDependencies": {
   }
 }

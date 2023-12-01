@@ -1,0 +1,19 @@
+{
+  "name": "example",
+  "version": "0.0.1",
+  "description": "Test app for ojotas ORM",
+  "scripts": {
+    "lint": "eslint ./src",
+    "ts": "node -r ts-node/register",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "ojotas-codegen": "../core/bin/codegen.js ./src && npm exec eslint ./src -- --fix"
+  },
+  "author": "agiletiger",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "mysql2": "^3.6.0",
+    "pg": "^8.11.3"
+  }
+}
