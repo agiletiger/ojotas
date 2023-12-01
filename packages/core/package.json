@@ -1,0 +1,40 @@
+{
+  "name": "core",
+  "version": "0.0.7",
+  "description": "",
+  "scripts": {
+    "lint": "eslint ./src",
+    "with-ts": "node -r ts-node/register",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
+    "test-unit-mysql": "DIALECT=mysql npm run with-ts -- --env-file=.env --test ./src/*.test.ts",
+    "test-unit-postgres": "DIALECT=postgres npm run with-ts -- --env-file=.env --test ./src/*.test.ts",
+    "test-unit": "npm run test-unit-mysql && npm run test-unit-postgres",
+    "test-integration-mysql": "DIALECT=mysql npm run with-ts -- --env-file=.env --test ./test/integration/*.test.ts",
+    "test-integration-postgres": "DIALECT=postgres npm run with-ts -- --env-file=.env --test ./test/integration/*.test.ts",
+    "test-integration": "npm run test-integration-mysql && npm run test-integration-postgres",
+    "test": "npm run test-unit && npm run test-integration"
+  },
+  "main": "./lib/cjs/orm.js",
+  "module": "./lib/esm/orm.js",
+  "types": "./lib/esm/orm.d.ts",
+  "files": [
+    "bin/*",
+    "lib/**/*",
+    "templates/*"
+  ],
+  "bin": {
+    "ojotas-codegen": "bin/codegen.js"
+  },
+  "author": "agiletiger",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "fast-glob": "^3.3.1",
+    "named-placeholders": "^1.1.3",
+    "node-sql-parser": "^4.11.0"
+  },
+  "peerDependencies": {
+    "mysql2": "^3.6.0",
+    "pg": "^8.11.3"
+  }
+}

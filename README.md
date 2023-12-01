@@ -35,7 +35,7 @@ No active record pattern, no dynamic methods, no obscure magic.
 - Provides performance hints, check [issue 13](https://github.com/agiletiger/ojotas/issues/13)
 
 ## Providing feedback
-There is a side repo [ojotas-test-app](https://github.com/agiletiger/ojotas-test-app) to play with ojotas orm and provide feedback
+There is an example app [ojotas-test-app](https://github.com/agiletiger/ojotas/tree/main/packages/example) to play with ojotas orm and provide feedback
 
 ## Roadmap
 ### V1
