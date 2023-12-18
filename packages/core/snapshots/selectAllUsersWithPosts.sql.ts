@@ -1,5 +1,7 @@
 
-export interface ISelectAllUsersWithPostsQueryResultItem { name: string; posts: Array<{ title?: string; content?: string; }>; }
+import { NonEmptyArray, PossiblyEmptyArray } from 'ojotas';
+
+export interface ISelectAllUsersWithPostsQueryResultItem { name: string; posts: NonEmptyArray<{ title?: string; content?: string; }>; }
 
 export const selectAllUsersWithPosts = () => {
   return {

@@ -19,6 +19,9 @@ export type MySqlConnectionConfig = mysql.ConnectionOptions;
 export type PostgreSqlConnectionConfig = string | ClientConfig;
 export type Dialect = 'mysql' | 'postgres';
 
+export type NonEmptyArray<T> = [T, ...T[]];
+export type PossiblyEmptyArray<T> = T[];
+
 export type Connection = {
   query: (
     sql: string,

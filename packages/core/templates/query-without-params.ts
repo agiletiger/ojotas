@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { NonEmptyArray, PossiblyEmptyArray } from 'ojotas';
+
 $returnTypePlaceholder$
 
 export const $queryName$ = () => {

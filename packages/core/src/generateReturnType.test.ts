@@ -17,10 +17,13 @@ describe('generateReturnType', () => {
   it('should create the type when querying from a single table listing the columns', () => {
     const queryName = 'selectAllUsers';
     const typeDefinition = generateReturnType(relations, queryName, {
-      users: [
-        { name: 'id', type: 'number', nullable: false },
-        { name: 'name', type: 'string', nullable: false },
-      ],
+      columns: {
+        users: [
+          { name: 'id', type: 'number', nullable: false },
+          { name: 'name', type: 'string', nullable: false },
+        ],
+      },
+      joinMetadata: {},
     });
 
     assertEqualIgnoreWhiteSpaces(
@@ -34,38 +37,17 @@ describe('generateReturnType', () => {
     );
   });
 
-  it('should create the type when querying a one to many relation', () => {
+  it('should create the type when querying a one to many relation (inner join)', () => {
     const queryName = 'selectAllUsersWithPosts';
     const typeDefinition = generateReturnType(relations, queryName, {
-      users: [{ name: 'name', type: 'string', nullable: false }],
-      posts: [
-        { name: 'title', type: 'string', nullable: true },
-        { name: 'content', type: 'string', nullable: true },
-      ],
-    });
-
-    assertEqualIgnoreWhiteSpaces(
-      typeDefinition,
-      `
-      export interface ISelectAllUsersWithPostsQueryResultItem {
-        name: string;
-        posts: Array<{
-          title?: string;
-          content?: string;
-        }>;
-      }
-      `,
-    );
-  });
-
-  it.skip('should create the type when querying a one to many relation (inner join)', () => {
-    const queryName = 'selectAllUsersWithPosts';
-    const typeDefinition = generateReturnType(relations, queryName, {
-      users: [{ name: 'name', type: 'string', nullable: false }],
-      posts: [
-        { name: 'title', type: 'string', nullable: true },
-        { name: 'content', type: 'string', nullable: true },
-      ],
+      columns: {
+        users: [{ name: 'name', type: 'string', nullable: false }],
+        posts: [
+          { name: 'title', type: 'string', nullable: true },
+          { name: 'content', type: 'string', nullable: true },
+        ],
+      },
+      joinMetadata: { users: { posts: 'INNER JOIN' } },
     });
 
     assertEqualIgnoreWhiteSpaces(
@@ -74,22 +56,25 @@ describe('generateReturnType', () => {
       export interface ISelectAllUsersWithPostsQueryResultItem {
         name: string;
         posts: NonEmptyArray<{
-          title: string;
-          content: string;
+          title?: string;
+          content?: string;
         }>;
       }
       `,
     );
   });
 
-  it.skip('should create the type when querying a one to many relation (left join)', () => {
+  it('should create the type when querying a one to many relation (left join)', () => {
     const queryName = 'selectAllUsersAndPosts';
     const typeDefinition = generateReturnType(relations, queryName, {
-      users: [{ name: 'name', type: 'string', nullable: false }],
-      posts: [
-        { name: 'title', type: 'string', nullable: true },
-        { name: 'content', type: 'string', nullable: true },
-      ],
+      columns: {
+        users: [{ name: 'name', type: 'string', nullable: false }],
+        posts: [
+          { name: 'title', type: 'string', nullable: true },
+          { name: 'content', type: 'string', nullable: true },
+        ],
+      },
+      joinMetadata: { users: { posts: 'LEFT JOIN' } },
     });
 
     assertEqualIgnoreWhiteSpaces(
@@ -98,8 +83,8 @@ describe('generateReturnType', () => {
       export interface ISelectAllUsersAndPostsQueryResultItem {
         name: string;
         posts: PossiblyEmptyArray<{
-          title: string;
-          content: string;
+          title?: string;
+          content?: string;
         }>;
       }
       `,

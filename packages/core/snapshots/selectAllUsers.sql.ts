@@ -1,4 +1,6 @@
 
+import { NonEmptyArray, PossiblyEmptyArray } from 'ojotas';
+
 export interface ISelectAllUsersQueryResultItem { id: number; name: string; }
 
 export const selectAllUsers = () => {
