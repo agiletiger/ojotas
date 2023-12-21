@@ -99,10 +99,10 @@ export interface ISelectAllUsersWithPostsQueryResultItem {
 ## API
 ```ts
 /** 
- * @param {Object} connection - active connection for the db you want to query.
- * @param {Function: (connection: Connection) => Promise<T[]>} sql - compiled representation of written sql string with type definitions.
+ * @param {Connection} connection - active connection for the db you want to query.
+ * @param {Descriptor<T>} descriptor - generated representation of the original sql file
  */
-query(connection: Connection, sql: SqlFn): Promise<T[]>;
+query<T>(connection: Connection, descriptor: Descriptor<T>): Promise<T[]>;
 ```
 
 
