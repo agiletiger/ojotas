@@ -66,7 +66,7 @@ There is an example app [ojotas-test-app](https://github.com/agiletiger/ojotas/t
   }
 }
 ```
-> you have a selectAllUsersWithPosts.sql file like this
+> you have a selectAllUsersWithPosts.sql file like this (notice you are using inner join)
 ```sql
 select u.name, p.title, p.content from users u inner join posts p on u.id = p.user_id
 ```
@@ -74,9 +74,23 @@ select u.name, p.title, p.content from users u inner join posts p on u.id = p.us
 ```ts
 export interface ISelectAllUsersWithPostsQueryResultItem {
   name: string;
-  posts: Array<{
-    title: string;
-    content: string;
+  posts: NonEmptyArray<{ // ojotas will tell you with the type that this array cannot be empty because of the inner join
+    title?: string;
+    content?: string;
+  }>;
+}
+```
+> but if you use a left join
+```sql
+select u.name, p.title, p.content from users u left join posts p on u.id = p.user_id
+```
+> this is the type the ORM will generate for a query without params
+```ts
+export interface ISelectAllUsersWithPostsQueryResultItem {
+  name: string;
+  posts: PossiblyEmptyArray<{ // ojotas will tell you with the type that this array could be empty because of the left join
+    title?: string;
+    content?: string;
   }>;
 }
 ```
@@ -85,10 +99,10 @@ export interface ISelectAllUsersWithPostsQueryResultItem {
 ## API
 ```ts
 /** 
- * @param {Object} connection - active connection for the db you want to query.
- * @param {Function: (connection: Connection) => Promise<T[]>} sql - compiled representation of written sql string with type definitions.
+ * @param {Connection} connection - active connection for the db you want to query.
+ * @param {Descriptor<T>} descriptor - generated representation of the original sql file
  */
-query(connection: Connection, sql: SqlFn): Promise<T[]>;
+query<T>(connection: Connection, descriptor: Descriptor<T>): Promise<T[]>;
 ```
 
 

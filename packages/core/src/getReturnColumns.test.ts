@@ -29,23 +29,26 @@ describe('getReturnColumns', () => {
         astify(dialect, 'select u.id, u.name from users u'),
       ),
       {
-        users: [
-          {
-            name: 'id',
-            nullable: false,
-            type: 'number',
-          },
-          {
-            name: 'name',
-            nullable: false,
-            type: 'string',
-          },
-        ],
+        columns: {
+          users: [
+            {
+              name: 'id',
+              nullable: false,
+              type: 'number',
+            },
+            {
+              name: 'name',
+              nullable: false,
+              type: 'string',
+            },
+          ],
+        },
+        joinMetadata: {},
       },
     );
   });
 
-  it('should work for two tables', () => {
+  it('should work for two tables (inner join)', () => {
     assert.deepEqual(
       getReturnColumns(
         modelTypes,
@@ -55,11 +58,58 @@ describe('getReturnColumns', () => {
         ),
       ),
       {
-        users: [{ name: 'name', nullable: false, type: 'string' }],
-        posts: [
-          { name: 'title', nullable: true, type: 'string' },
-          { name: 'content', nullable: true, type: 'string' },
-        ],
+        columns: {
+          users: [{ name: 'name', nullable: false, type: 'string' }],
+          posts: [
+            { name: 'title', nullable: true, type: 'string' },
+            { name: 'content', nullable: true, type: 'string' },
+          ],
+        },
+        joinMetadata: { users: { posts: 'INNER JOIN' } },
+      },
+    );
+  });
+
+  it('should work for two tables (left join)', () => {
+    assert.deepEqual(
+      getReturnColumns(
+        modelTypes,
+        astify(
+          dialect,
+          'select u.name, p.title, p.content from users u left join posts p on u.id = p.user_id',
+        ),
+      ),
+      {
+        columns: {
+          users: [{ name: 'name', nullable: false, type: 'string' }],
+          posts: [
+            { name: 'title', nullable: true, type: 'string' },
+            { name: 'content', nullable: true, type: 'string' },
+          ],
+        },
+        joinMetadata: { users: { posts: 'LEFT JOIN' } },
+      },
+    );
+  });
+
+  it('should work for two tables (right join)', () => {
+    assert.deepEqual(
+      getReturnColumns(
+        modelTypes,
+        astify(
+          dialect,
+          'select u.name, p.title, p.content from users u right join posts p on u.id = p.user_id',
+        ),
+      ),
+      {
+        columns: {
+          users: [{ name: 'name', nullable: false, type: 'string' }],
+          posts: [
+            { name: 'title', nullable: true, type: 'string' },
+            { name: 'content', nullable: true, type: 'string' },
+          ],
+        },
+        joinMetadata: { users: { posts: 'RIGHT JOIN' } },
       },
     );
   });
@@ -77,7 +127,7 @@ describe('getReturnColumns', () => {
           ),
         ),
         {
-          users: [{ name: 'id', nullable: false, type: 'number' }],
+          columns: { users: [{ name: 'id', nullable: false, type: 'number' }] },
         },
       );
     },
@@ -96,7 +146,7 @@ describe('getReturnColumns', () => {
           ),
         ),
         {
-          users: [{ name: 'id', nullable: false, type: 'number' }],
+          columns: { users: [{ name: 'id', nullable: false, type: 'number' }] },
         },
       );
     },

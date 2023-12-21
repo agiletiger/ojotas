@@ -1,15 +1,24 @@
-import { ReturnColumns } from './getReturnColumns';
+import { JoinMetadata, ReturnColumns } from './getReturnColumns';
 import { Relations } from './assemble';
 import { getReturnTypeName } from './getReturnTypeName';
+
+const getArrayType = (
+  joinMetadata: JoinMetadata,
+  prevTable: string,
+  currTable: string,
+) =>
+  joinMetadata[prevTable][currTable] === 'LEFT JOIN'
+    ? 'PossiblyEmptyArray'
+    : 'NonEmptyArray';
 
 export const generateReturnType = (
   relations: Relations,
   queryName: string,
-  selectedColumns: ReturnColumns,
+  selectedColumns: { columns: ReturnColumns; joinMetadata?: JoinMetadata },
 ) => {
   const tableTypes: { table: string; types: string }[] = [];
 
-  for (const [table, columns] of Object.entries(selectedColumns)) {
+  for (const [table, columns] of Object.entries(selectedColumns.columns)) {
     const types = columns
       .map(
         (column) =>
@@ -29,9 +38,14 @@ export const generateReturnType = (
           if (index === 0) {
             return types;
           } else {
-            const relation = relations[array[index - 1].table][table];
+            const prevTable = array[index - 1].table;
+            const relation = relations[prevTable][table];
             if (relation?.[0] === 'hasMany') {
-              return `${relation[1]}: Array<{\n${types}\n}>;`;
+              return `${relation[1]}: ${getArrayType(
+                selectedColumns.joinMetadata,
+                prevTable,
+                table,
+              )}<{\n${types}\n}>;`;
             }
           }
         })

@@ -1,7 +1,9 @@
+import { NonEmptyArray, PossiblyEmptyArray } from 'ojotas';
+
 export interface ISelectUsersWithPostsQueryResultItem {
   id: number;
   name: string;
-  posts: Array<{
+  posts: NonEmptyArray<{
     id: number;
     title?: string;
     content?: string;

@@ -38,7 +38,10 @@ export const generateSqlTsFile = (
     queryName,
     returnColumns,
   );
-  const identifiers = getIdentifiers(ojotasConfig.aliases, returnColumns);
+  const identifiers = getIdentifiers(
+    ojotasConfig.aliases,
+    returnColumns.columns,
+  );
 
   return (
     queryParams.length

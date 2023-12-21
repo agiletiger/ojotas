@@ -1,3 +1,5 @@
+import { NonEmptyArray, PossiblyEmptyArray } from 'ojotas';
+
 export type InsertUserQueryParams = {
   name: string;
 };

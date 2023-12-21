@@ -1,7 +1,9 @@
 
+import { NonEmptyArray, PossiblyEmptyArray } from 'ojotas';
+
 export type SelectUsersWithCertainPostsQueryParams = { title: string; };
 
-export interface ISelectUsersWithCertainPostsQueryResultItem { name: string; posts: Array<{ title?: string; content?: string; }>; }
+export interface ISelectUsersWithCertainPostsQueryResultItem { name: string; posts: NonEmptyArray<{ title?: string; content?: string; }>; }
 
 export const selectUsersWithCertainPosts = (params: SelectUsersWithCertainPostsQueryParams) => {
   return () => {

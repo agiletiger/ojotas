@@ -1,4 +1,6 @@
 
+import { NonEmptyArray, PossiblyEmptyArray } from 'ojotas';
+
 export type SelectUsersByNameQueryParams = { name: string; }; 
 
 export interface ISelectUsersByNameQueryResultItem { id: number; name: string; }
